@@ -170,7 +170,7 @@ const reservas = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_module
     }),
     nomeConvidado: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$text$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["text"])("nome_convidado").notNull(),
     emailConvidado: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$text$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["text"])("email_convidado"),
-    telefone: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$text$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["text"])("telefone"),
+    whatsapp: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$text$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["text"])("whatsapp"),
     mensagem: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$text$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["text"])("mensagem"),
     confirmado: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$boolean$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["boolean"])("confirmado").notNull().default(false),
     createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$drizzle$2d$orm$2f$pg$2d$core$2f$columns$2f$timestamp$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["timestamp"])("created_at", {

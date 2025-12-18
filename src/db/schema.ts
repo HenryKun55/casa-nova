@@ -99,7 +99,7 @@ export const reservas = pgTable("reservas", {
     .references(() => produtos.id, { onDelete: "cascade" }),
   nomeConvidado: text("nome_convidado").notNull(),
   emailConvidado: text("email_convidado"),
-  telefone: text("telefone"),
+  whatsapp: text("whatsapp"),
   mensagem: text("mensagem"), // Mensagem carinhosa opcional
   confirmado: boolean("confirmado").notNull().default(false), // Casal pode confirmar recebimento
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),

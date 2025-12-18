@@ -30,7 +30,7 @@ import { Loader2 } from "lucide-react";
 const reservaFormSchema = z.object({
   nomeConvidado: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   emailConvidado: z.string().email("Email inválido").optional().or(z.literal("")),
-  telefone: z.string().optional(),
+  whatsapp: z.string().optional(),
   mensagem: z.string().optional(),
 });
 
@@ -51,7 +51,7 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
     defaultValues: {
       nomeConvidado: "",
       emailConvidado: "",
-      telefone: "",
+      whatsapp: "",
       mensagem: "",
     },
   });
@@ -138,10 +138,10 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
 
                 <FormField
                   control={form.control}
-                  name="telefone"
+                  name="whatsapp"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telefone (opcional)</FormLabel>
+                      <FormLabel>WhatsApp (opcional)</FormLabel>
                       <FormControl>
                         <Input placeholder="(11) 99999-9999" {...field} />
                       </FormControl>

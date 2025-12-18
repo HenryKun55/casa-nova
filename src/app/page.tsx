@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Gift, Heart, Home } from "lucide-react";
+import { Gift, Heart, Home, Search } from "lucide-react";
 
 export default function HomePage() {
   const [timeLeft, setTimeLeft] = useState({
@@ -89,8 +89,18 @@ export default function HomePage() {
                 Ver Lista de Presentes
               </Button>
             </Link>
-            <Link href="/login">
+            <Link href="/minhas-reservas">
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Search className="mr-2 h-5 w-5" />
+                Consultar Minhas Reservas
+              </Button>
+            </Link>
+          </div>
+
+          {/* Admin Link */}
+          <div className="mt-8">
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
                 Área Administrativa
               </Button>
             </Link>
