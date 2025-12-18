@@ -83,13 +83,13 @@ export default function HomePage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Link href="/lista">
+            <Link href="/list">
               <Button size="lg" className="w-full sm:w-auto">
                 <Gift className="mr-2 h-5 w-5" />
                 Ver Lista de Presentes
               </Button>
             </Link>
-            <Link href="/minhas-reservas">
+            <Link href="/my-reservations">
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 <Search className="mr-2 h-5 w-5" />
                 Consultar Minhas Reservas

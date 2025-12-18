@@ -1,27 +1,27 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Produto, Reserva } from "@/db/schema";
-import type { CreateProdutoInput, UpdateProdutoInput } from "@/lib/validations/produto";
+import type { Product, Reservation } from "@/db/schema";
+import type { CreateProductInput, UpdateProductInput } from "@/lib/validations/product";
 
-export type ProdutoComReserva = Produto & {
-  reserva: Reserva | null;
+export type ProductWithReservation = Product & {
+  reservation: Reservation | null;
 };
 
-export function useProdutos() {
-  return useQuery<ProdutoComReserva[]>({
-    queryKey: ["produtos"],
+export function useProducts() {
+  return useQuery<ProductWithReservation[]>({
+    queryKey: ["products"],
     queryFn: async () => {
-      const res = await fetch("/api/produtos");
+      const res = await fetch("/api/products");
       if (!res.ok) throw new Error("Erro ao carregar produtos");
       return res.json();
     },
   });
 }
 
-export function useProduto(id: string) {
-  return useQuery<ProdutoComReserva>({
-    queryKey: ["produtos", id],
+export function useProduct(id: string) {
+  return useQuery<ProductWithReservation>({
+    queryKey: ["products", id],
     queryFn: async () => {
-      const res = await fetch(`/api/produtos/${id}`);
+      const res = await fetch(`/api/products/${id}`);
       if (!res.ok) throw new Error("Erro ao carregar produto");
       return res.json();
     },
@@ -29,12 +29,12 @@ export function useProduto(id: string) {
   });
 }
 
-export function useCreateProduto() {
+export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateProdutoInput) => {
-      const res = await fetch("/api/produtos", {
+    mutationFn: async (data: CreateProductInput) => {
+      const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -46,17 +46,17 @@ export function useCreateProduto() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["produtos"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 }
 
-export function useUpdateProduto(id: string) {
+export function useUpdateProduct(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateProdutoInput) => {
-      const res = await fetch(`/api/produtos/${id}`, {
+    mutationFn: async (data: UpdateProductInput) => {
+      const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -68,18 +68,18 @@ export function useUpdateProduto(id: string) {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["produtos"] });
-      queryClient.invalidateQueries({ queryKey: ["produtos", id] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["products", id] });
     },
   });
 }
 
-export function useDeleteProduto() {
+export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/produtos/${id}`, {
+      const res = await fetch(`/api/products/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -89,7 +89,7 @@ export function useDeleteProduto() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["produtos"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 }

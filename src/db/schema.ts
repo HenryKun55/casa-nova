@@ -72,36 +72,36 @@ export const verificationTokens = pgTable(
 
 // ==================== APP TABLES ====================
 
-export const produtos = pgTable("produtos", {
+export const products = pgTable("products", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => createId()),
-  nome: text("nome").notNull(),
-  descricao: text("descricao"),
-  preco: decimal("preco", { precision: 10, scale: 2 }).notNull(),
-  cor: text("cor"),
-  linkCompra: text("link_compra"), // URL de onde comprar
-  imagemUrl: text("imagem_url"), // URL da imagem uploadada
-  categoria: text("categoria"), // Ex: "Cozinha", "Quarto", "Banheiro"
-  quantidade: integer("quantidade").notNull().default(1),
-  prioridade: integer("prioridade").notNull().default(0),
+  name: text("name").notNull(),
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  color: text("color"),
+  purchaseLink: text("purchase_link"), // URL de onde comprar
+  imageUrl: text("image_url"), // URL da imagem uploadada
+  category: text("category"), // Ex: "Cozinha", "Quarto", "Banheiro"
+  quantity: integer("quantity").notNull().default(1),
+  priority: integer("priority").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
-export const reservas = pgTable("reservas", {
+export const reservations = pgTable("reservations", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => createId()),
-  produtoId: text("produto_id")
+  productId: text("product_id")
     .notNull()
     .unique()
-    .references(() => produtos.id, { onDelete: "cascade" }),
-  nomeConvidado: text("nome_convidado").notNull(),
-  emailConvidado: text("email_convidado"),
+    .references(() => products.id, { onDelete: "cascade" }),
+  guestName: text("guest_name").notNull(),
+  guestEmail: text("guest_email"),
   whatsapp: text("whatsapp"),
-  mensagem: text("mensagem"), // Mensagem carinhosa opcional
-  confirmado: boolean("confirmado").notNull().default(false), // Casal pode confirmar recebimento
+  message: text("message"), // Mensagem carinhosa opcional
+  confirmed: boolean("confirmed").notNull().default(false), // Casal pode confirmar recebimento
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
@@ -110,8 +110,8 @@ export const reservas = pgTable("reservas", {
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-export type Produto = typeof produtos.$inferSelect;
-export type NewProduto = typeof produtos.$inferInsert;
+export type Product = typeof products.$inferSelect;
+export type NewProduct = typeof products.$inferInsert;
 
-export type Reserva = typeof reservas.$inferSelect;
-export type NewReserva = typeof reservas.$inferInsert;
+export type Reservation = typeof reservations.$inferSelect;
+export type NewReservation = typeof reservations.$inferInsert;

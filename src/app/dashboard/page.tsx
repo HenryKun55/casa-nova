@@ -1,7 +1,7 @@
 "use client";
 
-import { useProdutos } from "@/hooks/use-produtos";
-import { useReservas } from "@/hooks/use-reservas";
+import { useProducts } from "@/hooks/use-products";
+import { useReservations } from "@/hooks/use-reservations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,23 +9,23 @@ import { Package, Gift, DollarSign, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
-  const { data: produtos, isLoading: loadingProdutos } = useProdutos();
-  const { data: reservas, isLoading: loadingReservas } = useReservas();
+  const { data: products, isLoading: loadingProducts } = useProducts();
+  const { data: reservations, isLoading: loadingReservations } = useReservations();
 
-  const totalProdutos = produtos?.length || 0;
-  const produtosReservados = produtos?.filter((p) => p.reserva).length || 0;
-  const totalReservas = reservas?.length || 0;
+  const totalProducts = products?.length || 0;
+  const reservedProducts = products?.filter((p) => p.reservation).length || 0;
+  const totalReservations = reservations?.length || 0;
 
-  const valorTotal = produtos?.reduce(
-    (acc, p) => acc + Number(p.preco) * p.quantidade,
+  const totalValue = products?.reduce(
+    (acc, p) => acc + Number(p.price) * p.quantity,
     0
   ) || 0;
 
-  const valorReservado = produtos
-    ?.filter((p) => p.reserva)
-    .reduce((acc, p) => acc + Number(p.preco) * p.quantidade, 0) || 0;
+  const reservedValue = products
+    ?.filter((p) => p.reservation)
+    .reduce((acc, p) => acc + Number(p.price) * p.quantity, 0) || 0;
 
-  const isLoading = loadingProdutos || loadingReservas;
+  const isLoading = loadingProducts || loadingReservations;
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", {
@@ -43,7 +43,7 @@ export default function DashboardPage() {
             Gerencie sua lista de chá de casa nova
           </p>
         </div>
-        <Link href="/dashboard/produtos">
+        <Link href="/dashboard/products">
           <Button>
             <Package className="mr-2 h-4 w-4" />
             Gerenciar Produtos
@@ -64,7 +64,7 @@ export default function DashboardPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold">{totalProdutos}</div>
+              <div className="text-2xl font-bold">{totalProducts}</div>
             )}
           </CardContent>
         </Card>
@@ -81,10 +81,10 @@ export default function DashboardPage() {
               <Skeleton className="h-8 w-20" />
             ) : (
               <div>
-                <div className="text-2xl font-bold">{produtosReservados}</div>
+                <div className="text-2xl font-bold">{reservedProducts}</div>
                 <p className="text-xs text-muted-foreground">
-                  {totalProdutos > 0
-                    ? `${((produtosReservados / totalProdutos) * 100).toFixed(0)}% da lista`
+                  {totalProducts > 0
+                    ? `${((reservedProducts / totalProducts) * 100).toFixed(0)}% da lista`
                     : "0% da lista"}
                 </p>
               </div>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
               <Skeleton className="h-8 w-32" />
             ) : (
               <div className="text-2xl font-bold">
-                {formatCurrency(valorTotal)}
+                {formatCurrency(totalValue)}
               </div>
             )}
           </CardContent>
@@ -121,11 +121,11 @@ export default function DashboardPage() {
             ) : (
               <div>
                 <div className="text-2xl font-bold">
-                  {formatCurrency(valorReservado)}
+                  {formatCurrency(reservedValue)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {valorTotal > 0
-                    ? `${((valorReservado / valorTotal) * 100).toFixed(0)}% do total`
+                  {totalValue > 0
+                    ? `${((reservedValue / totalValue) * 100).toFixed(0)}% do total`
                     : "0% do total"}
                 </p>
               </div>
@@ -152,21 +152,21 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          ) : reservas && reservas.length > 0 ? (
+          ) : reservations && reservations.length > 0 ? (
             <div className="space-y-4">
-              {reservas.slice(0, 5).map((reserva) => (
+              {reservations.slice(0, 5).map((reservation) => (
                 <div
-                  key={reserva.id}
+                  key={reservation.id}
                   className="flex items-center justify-between border-b pb-4 last:border-0"
                 >
                   <div>
-                    <p className="font-medium">{reserva.nomeConvidado}</p>
+                    <p className="font-medium">{reservation.guestName}</p>
                     <p className="text-sm text-muted-foreground">
-                      {reserva.produto.nome} • {formatCurrency(Number(reserva.produto.preco))}
+                      {reservation.product.name} • {formatCurrency(Number(reservation.product.price))}
                     </p>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {new Date(reserva.createdAt).toLocaleDateString("pt-BR")}
+                    {new Date(reservation.createdAt).toLocaleDateString("pt-BR")}
                   </div>
                 </div>
               ))}

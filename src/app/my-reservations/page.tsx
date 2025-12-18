@@ -46,37 +46,37 @@ const formatPhone = (value: string, countryCode: keyof typeof COUNTRY_CODES): st
   return numbers;
 };
 
-interface MinhaReserva {
+interface MyReservation {
   id: string;
-  nomeConvidado: string;
-  emailConvidado: string | null;
+  guestName: string;
+  guestEmail: string | null;
   whatsapp: string | null;
-  mensagem: string | null;
-  confirmado: boolean;
+  message: string | null;
+  confirmed: boolean;
   createdAt: Date;
-  produto: {
+  product: {
     id: string;
-    nome: string;
-    descricao: string | null;
-    preco: string;
-    cor: string | null;
-    imagemUrl: string | null;
-    linkCompra: string | null;
+    name: string;
+    description: string | null;
+    price: string;
+    color: string | null;
+    imageUrl: string | null;
+    purchaseLink: string | null;
   };
 }
 
-export default function MinhasReservasPage() {
+export default function MyReservationsPage() {
   const [countryCode, setCountryCode] = useState<keyof typeof COUNTRY_CODES>("BR");
   const [whatsapp, setWhatsapp] = useState("");
-  const [whatsappBusca, setWhatsappBusca] = useState("");
+  const [searchWhatsapp, setSearchWhatsapp] = useState("");
 
-  const { data: reservas, isLoading, error } = useQuery<MinhaReserva[]>({
-    queryKey: ["minhas-reservas", whatsappBusca],
+  const { data: reservations, isLoading, error } = useQuery<MyReservation[]>({
+    queryKey: ["my-reservations", searchWhatsapp],
     queryFn: async () => {
-      if (!whatsappBusca) return [];
+      if (!searchWhatsapp) return [];
 
       const response = await fetch(
-        `/api/reservas/minhas?whatsapp=${encodeURIComponent(whatsappBusca)}`
+        `/api/reservations/my?whatsapp=${encodeURIComponent(searchWhatsapp)}`
       );
 
       if (!response.ok) {
@@ -85,27 +85,27 @@ export default function MinhasReservasPage() {
 
       return response.json();
     },
-    enabled: !!whatsappBusca,
+    enabled: !!searchWhatsapp,
   });
 
-  const handleBuscar = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (whatsapp.trim()) {
       const country = COUNTRY_CODES[countryCode];
       const whatsappFormatted = `${country.code} ${whatsapp.trim()}`;
-      setWhatsappBusca(whatsappFormatted);
+      setSearchWhatsapp(whatsappFormatted);
     }
   };
 
-  const formatarPreco = (preco: string) => {
+  const formatPrice = (price: string) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(Number(preco));
+    }).format(Number(price));
   };
 
-  const formatarData = (data: Date) => {
-    return new Date(data).toLocaleDateString("pt-BR", {
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -141,7 +141,7 @@ export default function MinhasReservasPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleBuscar} className="space-y-4">
+            <form onSubmit={handleSearch} className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium">
@@ -203,7 +203,7 @@ export default function MinhasReservasPage() {
           </Card>
         )}
 
-        {whatsappBusca && !isLoading && reservas && reservas.length === 0 && (
+        {searchWhatsapp && !isLoading && reservations && reservations.length === 0 && (
           <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="pt-6">
               <p className="text-center text-yellow-800">
@@ -215,20 +215,20 @@ export default function MinhasReservasPage() {
           </Card>
         )}
 
-        {reservas && reservas.length > 0 && (
+        {reservations && reservations.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold text-gray-900">
-              Suas Reservas ({reservas.length})
+              Suas Reservas ({reservations.length})
             </h2>
 
-            {reservas.map((reserva) => (
-              <Card key={reserva.id}>
+            {reservations.map((reservation) => (
+              <Card key={reservation.id}>
                 <CardContent className="p-6">
                   <div className="flex flex-col gap-4 md:flex-row">
-                    {reserva.produto.imagemUrl && (
+                    {reservation.product.imageUrl && (
                       <img
-                        src={reserva.produto.imagemUrl}
-                        alt={reserva.produto.nome}
+                        src={reservation.product.imageUrl}
+                        alt={reservation.product.name}
                         className="h-32 w-32 rounded-lg object-cover"
                       />
                     )}
@@ -237,23 +237,23 @@ export default function MinhasReservasPage() {
                       <div className="mb-2 flex items-start justify-between">
                         <div>
                           <h3 className="text-xl font-semibold">
-                            {reserva.produto.nome}
+                            {reservation.product.name}
                           </h3>
-                          {reserva.produto.cor && (
+                          {reservation.product.color && (
                             <p className="text-sm text-gray-600">
-                              Cor: {reserva.produto.cor}
+                              Cor: {reservation.product.color}
                             </p>
                           )}
                         </div>
                         <Badge
-                          variant={reserva.confirmado ? "default" : "secondary"}
+                          variant={reservation.confirmed ? "default" : "secondary"}
                           className={
-                            reserva.confirmado
+                            reservation.confirmed
                               ? "bg-green-500 hover:bg-green-600"
                               : ""
                           }
                         >
-                          {reserva.confirmado ? (
+                          {reservation.confirmed ? (
                             <>
                               <CheckCircle2 className="mr-1 h-3 w-3" />
                               Confirmado
@@ -267,34 +267,34 @@ export default function MinhasReservasPage() {
                         </Badge>
                       </div>
 
-                      {reserva.produto.descricao && (
+                      {reservation.product.description && (
                         <p className="mb-2 text-sm text-gray-600">
-                          {reserva.produto.descricao}
+                          {reservation.product.description}
                         </p>
                       )}
 
                       <p className="mb-2 text-lg font-semibold text-rose-600">
-                        {formatarPreco(reserva.produto.preco)}
+                        {formatPrice(reservation.product.price)}
                       </p>
 
                       <p className="text-sm text-gray-500">
-                        Reservado em: {formatarData(reserva.createdAt)}
+                        Reservado em: {formatDate(reservation.createdAt)}
                       </p>
 
-                      {reserva.mensagem && (
+                      {reservation.message && (
                         <div className="mt-3 rounded-lg bg-gray-50 p-3">
                           <p className="text-sm font-medium text-gray-700">
                             Sua mensagem:
                           </p>
                           <p className="text-sm text-gray-600">
-                            {reserva.mensagem}
+                            {reservation.message}
                           </p>
                         </div>
                       )}
 
-                      {reserva.produto.linkCompra && (
+                      {reservation.product.purchaseLink && (
                         <a
-                          href={reserva.produto.linkCompra}
+                          href={reservation.product.purchaseLink}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="mt-3 inline-block"

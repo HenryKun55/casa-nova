@@ -29,9 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateReserva } from "@/hooks/use-reservas";
+import { useCreateReservation } from "@/hooks/use-reservations";
 import { toast } from "sonner";
-import type { ProdutoComReserva } from "@/hooks/use-produtos";
+import type { ProductWithReservation } from "@/hooks/use-products";
 import { Loader2 } from "lucide-react";
 
 const COUNTRY_CODES = {
@@ -64,41 +64,41 @@ const formatPhone = (value: string, countryCode: keyof typeof COUNTRY_CODES): st
   return numbers;
 };
 
-const reservaFormSchema = z.object({
-  nomeConvidado: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  emailConvidado: z.string().email("Email inválido").optional().or(z.literal("")),
+const reservationFormSchema = z.object({
+  guestName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  guestEmail: z.string().email("Email inválido").optional().or(z.literal("")),
   countryCode: z.enum(["BR", "US", "AU"]),
   whatsapp: z.string().optional(),
-  mensagem: z.string().optional(),
+  message: z.string().optional(),
 });
 
-type ReservaFormValues = z.infer<typeof reservaFormSchema>;
+type ReservationFormValues = z.infer<typeof reservationFormSchema>;
 
-interface ReservaModalProps {
-  produto: ProdutoComReserva | null;
+interface ReservationModalProps {
+  product: ProductWithReservation | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps) {
-  const createReserva = useCreateReserva();
+export function ReservationModal({ product, open, onOpenChange }: ReservationModalProps) {
+  const createReservation = useCreateReservation();
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const form = useForm<ReservaFormValues>({
-    resolver: zodResolver(reservaFormSchema),
+  const form = useForm<ReservationFormValues>({
+    resolver: zodResolver(reservationFormSchema),
     defaultValues: {
-      nomeConvidado: "",
-      emailConvidado: "",
+      guestName: "",
+      guestEmail: "",
       countryCode: "BR",
       whatsapp: "",
-      mensagem: "",
+      message: "",
     },
   });
 
   const selectedCountry = form.watch("countryCode");
 
-  const onSubmit = async (data: ReservaFormValues) => {
-    if (!produto) return;
+  const onSubmit = async (data: ReservationFormValues) => {
+    if (!product) return;
 
     try {
       // Formata o WhatsApp com código do país
@@ -107,12 +107,12 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
         ? `${country.code} ${data.whatsapp}`
         : "";
 
-      await createReserva.mutateAsync({
-        produtoId: produto.id,
-        nomeConvidado: data.nomeConvidado,
-        emailConvidado: data.emailConvidado,
+      await createReservation.mutateAsync({
+        productId: product.id,
+        guestName: data.guestName,
+        guestEmail: data.guestEmail,
         whatsapp: whatsappFormatted,
-        mensagem: data.mensagem,
+        message: data.message,
       });
       setIsSuccess(true);
       toast.success("Presente reservado com sucesso! 🎉");
@@ -126,12 +126,12 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
     }
   };
 
-  if (!produto) return null;
+  if (!product) return null;
 
-  const precoFormatado = new Intl.NumberFormat("pt-BR", {
+  const formattedPrice = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
-  }).format(Number(produto.preco));
+  }).format(Number(product.price));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -149,14 +149,14 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
             <DialogHeader>
               <DialogTitle>Reservar Presente</DialogTitle>
               <DialogDescription>
-                {produto.nome} • {precoFormatado}
+                {product.name} • {formattedPrice}
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="nomeConvidado"
+                  name="guestName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Seu Nome *</FormLabel>
@@ -170,7 +170,7 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
 
                 <FormField
                   control={form.control}
-                  name="emailConvidado"
+                  name="guestEmail"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email (opcional)</FormLabel>
@@ -241,7 +241,7 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
 
                 <FormField
                   control={form.control}
-                  name="mensagem"
+                  name="message"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Mensagem Carinhosa (opcional)</FormLabel>
@@ -268,10 +268,10 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
                   </Button>
                   <Button
                     type="submit"
-                    disabled={createReserva.isPending}
+                    disabled={createReservation.isPending}
                     className="flex-1"
                   >
-                    {createReserva.isPending ? (
+                    {createReservation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Reservando...

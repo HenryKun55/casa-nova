@@ -15,56 +15,56 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useCreateProduto, useUpdateProduto, type ProdutoComReserva } from "@/hooks/use-produtos";
+import { useCreateProduct, useUpdateProduct, type ProductWithReservation } from "@/hooks/use-products";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-const produtoFormSchema = z.object({
-  nome: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  descricao: z.string().optional(),
-  preco: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preço inválido (use formato: 99.99)"),
-  cor: z.string().optional(),
-  linkCompra: z.string().url("Link inválido").optional().or(z.literal("")),
-  imagemUrl: z.string().url("URL da imagem inválida").optional().or(z.literal("")),
-  categoria: z.string().optional(),
-  quantidade: z.number().int().min(1),
-  prioridade: z.number().int().min(0),
+const productFormSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  description: z.string().optional(),
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preço inválido (use formato: 99.99)"),
+  color: z.string().optional(),
+  purchaseLink: z.string().url("Link inválido").optional().or(z.literal("")),
+  imageUrl: z.string().url("URL da imagem inválida").optional().or(z.literal("")),
+  category: z.string().optional(),
+  quantity: z.number().int().min(1),
+  priority: z.number().int().min(0),
 });
 
-type ProdutoFormValues = z.infer<typeof produtoFormSchema>;
+type ProductFormValues = z.infer<typeof productFormSchema>;
 
-interface ProdutoFormProps {
-  produto?: ProdutoComReserva;
+interface ProductFormProps {
+  product?: ProductWithReservation;
   onSuccess?: () => void;
 }
 
-export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
-  const createProduto = useCreateProduto();
-  const updateProduto = useUpdateProduto(produto?.id || "");
-  const isEditing = !!produto;
+export function ProductForm({ product, onSuccess }: ProductFormProps) {
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct(product?.id || "");
+  const isEditing = !!product;
 
-  const form = useForm<ProdutoFormValues>({
-    resolver: zodResolver(produtoFormSchema),
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
-      nome: produto?.nome || "",
-      descricao: produto?.descricao || "",
-      preco: produto?.preco || "",
-      cor: produto?.cor || "",
-      linkCompra: produto?.linkCompra || "",
-      imagemUrl: produto?.imagemUrl || "",
-      categoria: produto?.categoria || "",
-      quantidade: produto?.quantidade || 1,
-      prioridade: produto?.prioridade || 0,
+      name: product?.name || "",
+      description: product?.description || "",
+      price: product?.price || "",
+      color: product?.color || "",
+      purchaseLink: product?.purchaseLink || "",
+      imageUrl: product?.imageUrl || "",
+      category: product?.category || "",
+      quantity: product?.quantity || 1,
+      priority: product?.priority || 0,
     },
   });
 
-  const onSubmit = async (data: ProdutoFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
     try {
       if (isEditing) {
-        await updateProduto.mutateAsync(data);
+        await updateProduct.mutateAsync(data);
         toast.success("Produto atualizado com sucesso!");
       } else {
-        await createProduto.mutateAsync(data);
+        await createProduct.mutateAsync(data);
         toast.success("Produto criado com sucesso!");
         form.reset();
       }
@@ -74,7 +74,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
     }
   };
 
-  const isLoading = createProduto.isPending || updateProduto.isPending;
+  const isLoading = createProduct.isPending || updateProduct.isPending;
 
   return (
     <Form {...form}>
@@ -82,7 +82,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
         <div className="grid gap-6 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="nome"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nome do Produto *</FormLabel>
@@ -96,7 +96,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
 
           <FormField
             control={form.control}
-            name="preco"
+            name="price"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Preço *</FormLabel>
@@ -112,7 +112,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
 
         <FormField
           control={form.control}
-          name="descricao"
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Descrição</FormLabel>
@@ -131,7 +131,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
         <div className="grid gap-6 md:grid-cols-3">
           <FormField
             control={form.control}
-            name="categoria"
+            name="category"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Categoria</FormLabel>
@@ -145,7 +145,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
 
           <FormField
             control={form.control}
-            name="cor"
+            name="color"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Cor</FormLabel>
@@ -159,7 +159,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
 
           <FormField
             control={form.control}
-            name="quantidade"
+            name="quantity"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Quantidade</FormLabel>
@@ -179,7 +179,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
         <div className="grid gap-6 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="linkCompra"
+            name="purchaseLink"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Link para Compra</FormLabel>
@@ -193,7 +193,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
 
           <FormField
             control={form.control}
-            name="imagemUrl"
+            name="imageUrl"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>URL da Imagem</FormLabel>
@@ -208,7 +208,7 @@ export function ProdutoForm({ produto, onSuccess }: ProdutoFormProps) {
 
         <FormField
           control={form.control}
-          name="prioridade"
+          name="priority"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Prioridade</FormLabel>

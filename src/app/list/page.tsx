@@ -1,38 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { useProdutos } from "@/hooks/use-produtos";
+import { useProducts } from "@/hooks/use-products";
 import { ProductCard } from "@/components/product-card";
-import { ReservaModal } from "@/components/reserva-modal";
+import { ReservationModal } from "@/components/reservation-modal";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search } from "lucide-react";
-import type { ProdutoComReserva } from "@/hooks/use-produtos";
+import type { ProductWithReservation } from "@/hooks/use-products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function ListaPage() {
-  const { data: produtos, isLoading } = useProdutos();
-  const [selectedProduto, setSelectedProduto] = useState<ProdutoComReserva | null>(null);
+export default function ListPage() {
+  const { data: products, isLoading } = useProducts();
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithReservation | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const categorias = Array.from(
-    new Set(produtos?.map((p) => p.categoria).filter(Boolean))
+  const categories = Array.from(
+    new Set(products?.map((p) => p.category).filter(Boolean))
   );
 
-  const produtosFiltrados = produtos?.filter((produto) => {
-    const matchesSearch = produto.nome
+  const filteredProducts = products?.filter((product) => {
+    const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const matchesCategoria =
-      !selectedCategoria || produto.categoria === selectedCategoria;
-    return matchesSearch && matchesCategoria;
+    const matchesCategory =
+      !selectedCategory || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const totalProdutos = produtos?.length || 0;
-  const produtosReservados = produtos?.filter((p) => p.reserva).length || 0;
-  const progresso = totalProdutos > 0 ? (produtosReservados / totalProdutos) * 100 : 0;
+  const totalProducts = products?.length || 0;
+  const reservedProducts = products?.filter((p) => p.reservation).length || 0;
+  const progress = totalProducts > 0 ? (reservedProducts / totalProducts) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
@@ -61,13 +61,13 @@ export default function ListaPage() {
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium">Progresso da Lista</span>
             <span className="text-sm text-muted-foreground">
-              {produtosReservados} de {totalProdutos} presentes reservados
+              {reservedProducts} de {totalProducts} presentes reservados
             </span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-rose-100">
             <div
               className="h-full bg-rose-500 transition-all duration-500"
-              style={{ width: `${progresso}%` }}
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>
@@ -84,23 +84,23 @@ export default function ListaPage() {
             />
           </div>
 
-          {categorias.length > 0 && (
+          {categories.length > 0 && (
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={selectedCategoria === null ? "default" : "outline"}
+                variant={selectedCategory === null ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedCategoria(null)}
+                onClick={() => setSelectedCategory(null)}
               >
                 Todas
               </Button>
-              {categorias.map((categoria) => (
+              {categories.map((category) => (
                 <Button
-                  key={categoria}
-                  variant={selectedCategoria === categoria ? "default" : "outline"}
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategoria(categoria)}
+                  onClick={() => setSelectedCategory(category)}
                 >
-                  {categoria}
+                  {category}
                 </Button>
               ))}
             </div>
@@ -118,20 +118,20 @@ export default function ListaPage() {
               </div>
             ))}
           </div>
-        ) : produtosFiltrados && produtosFiltrados.length > 0 ? (
+        ) : filteredProducts && filteredProducts.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {produtosFiltrados.map((produto) => (
+            {filteredProducts.map((product) => (
               <ProductCard
-                key={produto.id}
-                produto={produto}
-                onReservar={setSelectedProduto}
+                key={product.id}
+                product={product}
+                onReserve={setSelectedProduct}
               />
             ))}
           </div>
         ) : (
           <div className="py-12 text-center">
             <p className="text-muted-foreground">
-              {searchTerm || selectedCategoria
+              {searchTerm || selectedCategory
                 ? "Nenhum produto encontrado com os filtros aplicados"
                 : "Ainda não há produtos na lista"}
             </p>
@@ -140,10 +140,10 @@ export default function ListaPage() {
       </div>
 
       {/* Modal de Reserva */}
-      <ReservaModal
-        produto={selectedProduto}
-        open={!!selectedProduto}
-        onOpenChange={(open) => !open && setSelectedProduto(null)}
+      <ReservationModal
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onOpenChange={(open) => !open && setSelectedProduct(null)}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { users, accounts, sessions, produtos, reservas } from "./schema";
+import { users, accounts, sessions, products, reservations } from "./schema";
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -20,16 +20,16 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   }),
 }));
 
-export const produtosRelations = relations(produtos, ({ one }) => ({
-  reserva: one(reservas, {
-    fields: [produtos.id],
-    references: [reservas.produtoId],
+export const productsRelations = relations(products, ({ one }) => ({
+  reservation: one(reservations, {
+    fields: [products.id],
+    references: [reservations.productId],
   }),
 }));
 
-export const reservasRelations = relations(reservas, ({ one }) => ({
-  produto: one(produtos, {
-    fields: [reservas.produtoId],
-    references: [produtos.id],
+export const reservationsRelations = relations(reservations, ({ one }) => ({
+  product: one(products, {
+    fields: [reservations.productId],
+    references: [products.id],
   }),
 }));

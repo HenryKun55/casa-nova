@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { produtos } from "@/db/schema";
-import { createProdutoSchema } from "@/lib/validations/produto";
+import { products } from "@/db/schema";
+import { createProductSchema } from "@/lib/validations/product";
 import { desc } from "drizzle-orm";
 import { ZodError } from "zod";
 
-// GET /api/produtos - Listar todos com reservas
 export async function GET() {
   try {
-    const result = await db.query.produtos.findMany({
+    const result = await db.query.products.findMany({
       with: {
-        reserva: true,
+        reservation: true,
       },
-      orderBy: [desc(produtos.prioridade), desc(produtos.createdAt)],
+      orderBy: [desc(products.priority), desc(products.createdAt)],
     });
 
     return NextResponse.json(result);
@@ -26,7 +25,6 @@ export async function GET() {
   }
 }
 
-// POST /api/produtos - Criar produto (só admin)
 export async function POST(request: Request) {
   try {
     const session = await auth();
@@ -36,14 +34,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const validated = createProdutoSchema.parse(body);
+    const validated = createProductSchema.parse(body);
 
-    const [novoProduto] = await db
-      .insert(produtos)
+    const [newProduct] = await db
+      .insert(products)
       .values(validated)
       .returning();
 
-    return NextResponse.json(novoProduto, { status: 201 });
+    return NextResponse.json(newProduct, { status: 201 });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(

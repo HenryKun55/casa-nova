@@ -32,7 +32,7 @@ export default async function DashboardLayout({
                   Visão Geral
                 </Button>
               </Link>
-              <Link href="/dashboard/produtos">
+              <Link href="/dashboard/products">
                 <Button variant="ghost" size="sm">
                   <Gift className="mr-2 h-4 w-4" />
                   Produtos

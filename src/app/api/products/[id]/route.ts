@@ -1,34 +1,33 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { produtos } from "@/db/schema";
-import { updateProdutoSchema } from "@/lib/validations/produto";
+import { products } from "@/db/schema";
+import { updateProductSchema } from "@/lib/validations/product";
 import { eq } from "drizzle-orm";
 import { ZodError } from "zod";
 
-// GET /api/produtos/[id] - Buscar um produto
 export async function GET(
-  request: Request,
+  _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
 
-    const produto = await db.query.produtos.findFirst({
-      where: eq(produtos.id, id),
+    const product = await db.query.products.findFirst({
+      where: eq(products.id, id),
       with: {
-        reserva: true,
+        reservation: true,
       },
     });
 
-    if (!produto) {
+    if (!product) {
       return NextResponse.json(
         { error: "Produto não encontrado" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(produto);
+    return NextResponse.json(product);
   } catch (error) {
     console.error("Erro ao buscar produto:", error);
     return NextResponse.json(
@@ -38,7 +37,6 @@ export async function GET(
   }
 }
 
-// PUT /api/produtos/[id] - Atualizar produto (só admin)
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -52,12 +50,12 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const validated = updateProdutoSchema.parse(body);
+    const validated = updateProductSchema.parse(body);
 
     const [updated] = await db
-      .update(produtos)
+      .update(products)
       .set({ ...validated, updatedAt: new Date() })
-      .where(eq(produtos.id, id))
+      .where(eq(products.id, id))
       .returning();
 
     if (!updated) {
@@ -84,9 +82,8 @@ export async function PUT(
   }
 }
 
-// DELETE /api/produtos/[id] - Deletar produto (só admin)
 export async function DELETE(
-  request: Request,
+  _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -99,8 +96,8 @@ export async function DELETE(
     const { id } = await params;
 
     const [deleted] = await db
-      .delete(produtos)
-      .where(eq(produtos.id, id))
+      .delete(products)
+      .where(eq(products.id, id))
       .returning();
 
     if (!deleted) {

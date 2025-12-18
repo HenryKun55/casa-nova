@@ -1,42 +1,40 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { produtos, reservas } from "@/db/schema";
-import { createReservaSchema } from "@/lib/validations/reserva";
+import { products, reservations } from "@/db/schema";
+import { createReservationSchema } from "@/lib/validations/reservation";
 import { eq } from "drizzle-orm";
 import { ZodError } from "zod";
 
-// POST /api/reservas - Criar reserva (público)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const validated = createReservaSchema.parse(body);
+    const validated = createReservationSchema.parse(body);
 
-    // Verificar se produto existe e não está reservado
-    const produto = await db.query.produtos.findFirst({
-      where: eq(produtos.id, validated.produtoId),
-      with: { reserva: true },
+    const product = await db.query.products.findFirst({
+      where: eq(products.id, validated.productId),
+      with: { reservation: true },
     });
 
-    if (!produto) {
+    if (!product) {
       return NextResponse.json(
         { error: "Produto não encontrado" },
         { status: 404 }
       );
     }
 
-    if (produto.reserva) {
+    if (product.reservation) {
       return NextResponse.json(
         { error: "Produto já reservado" },
         { status: 400 }
       );
     }
 
-    const [novaReserva] = await db
-      .insert(reservas)
+    const [newReservation] = await db
+      .insert(reservations)
       .values(validated)
       .returning();
 
-    return NextResponse.json(novaReserva, { status: 201 });
+    return NextResponse.json(newReservation, { status: 201 });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(
@@ -53,14 +51,13 @@ export async function POST(request: Request) {
   }
 }
 
-// GET /api/reservas - Listar todas as reservas (admin only via middleware ou check aqui)
 export async function GET() {
   try {
-    const result = await db.query.reservas.findMany({
+    const result = await db.query.reservations.findMany({
       with: {
-        produto: true,
+        product: true,
       },
-      orderBy: (reservas, { desc }) => [desc(reservas.createdAt)],
+      orderBy: (reservations, { desc }) => [desc(reservations.createdAt)],
     });
 
     return NextResponse.json(result);
