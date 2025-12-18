@@ -1,0 +1,43 @@
+{
+  "node": {
+    "009e089267e7505541fc435d2e5f7da9d76a355d40": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 78596,
+          "async": false,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "src/app/dashboard/layout.tsx"
+        },
+        "app/dashboard/produtos/page": {
+          "moduleId": 61736,
+          "async": false,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "src/app/dashboard/layout.tsx"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc",
+        "app/dashboard/produtos/page": "rsc"
+      },
+      "filename": "src/app/dashboard/layout.tsx",
+      "exportedName": "$$RSC_SERVER_ACTION_0"
+    },
+    "007051aa5e2bec28b598978a12c22a3788f9a65d44": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": 22542,
+          "async": false,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "src/app/login/page.tsx"
+        }
+      },
+      "layer": {
+        "app/login/page": "rsc"
+      },
+      "filename": "src/app/login/page.tsx",
+      "exportedName": "$$RSC_SERVER_ACTION_0"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "UVRZLwQZecNS0z53Iy0SfurXvfVtyq0RFmDDezOwfT0="
+}

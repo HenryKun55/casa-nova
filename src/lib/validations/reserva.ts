@@ -10,7 +10,7 @@ export const insertReservaSchema = createInsertSchema(reservas, {
     .email("Email inválido")
     .optional()
     .or(z.literal("")),
-  telefone: z.string().optional(),
+  whatsapp: z.string().optional(),
   mensagem: z.string().optional(),
 });
 

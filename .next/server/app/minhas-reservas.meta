@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/minhas-reservas/layout,_N_T_/minhas-reservas/page,_N_T_/minhas-reservas"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/minhas-reservas/__PAGE__",
+    "/minhas-reservas",
+    "/_index",
+    "/_head"
+  ]
+}
