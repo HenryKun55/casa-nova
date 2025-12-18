@@ -6,8 +6,45 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Search, CheckCircle2, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+
+const COUNTRY_CODES = {
+  BR: { code: "+55", placeholder: "(11) 99999-9999", flag: "🇧🇷", name: "Brasil" },
+  US: { code: "+1", placeholder: "(999) 999-9999", flag: "🇺🇸", name: "EUA" },
+  AU: { code: "+61", placeholder: "0400 000 000", flag: "🇦🇺", name: "Austrália" },
+} as const;
+
+const formatPhone = (value: string, countryCode: keyof typeof COUNTRY_CODES): string => {
+  const numbers = value.replace(/\D/g, "");
+
+  if (countryCode === "BR") {
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  }
+
+  if (countryCode === "US") {
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
+    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+  }
+
+  if (countryCode === "AU") {
+    if (numbers.length <= 4) return numbers;
+    if (numbers.length <= 7) return `${numbers.slice(0, 4)} ${numbers.slice(4)}`;
+    return `${numbers.slice(0, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7, 10)}`;
+  }
+
+  return numbers;
+};
 
 interface MinhaReserva {
   id: string;
@@ -29,6 +66,7 @@ interface MinhaReserva {
 }
 
 export default function MinhasReservasPage() {
+  const [countryCode, setCountryCode] = useState<keyof typeof COUNTRY_CODES>("BR");
   const [whatsapp, setWhatsapp] = useState("");
   const [whatsappBusca, setWhatsappBusca] = useState("");
 
@@ -53,7 +91,9 @@ export default function MinhasReservasPage() {
   const handleBuscar = (e: React.FormEvent) => {
     e.preventDefault();
     if (whatsapp.trim()) {
-      setWhatsappBusca(whatsapp.trim());
+      const country = COUNTRY_CODES[countryCode];
+      const whatsappFormatted = `${country.code} ${whatsapp.trim()}`;
+      setWhatsappBusca(whatsappFormatted);
     }
   };
 
@@ -101,21 +141,53 @@ export default function MinhasReservasPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleBuscar} className="flex gap-2">
-              <Input
-                type="tel"
-                placeholder="(11) 99999-9999"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                className="flex-1"
-              />
-              <Button type="submit" disabled={isLoading}>
+            <form onSubmit={handleBuscar} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    País
+                  </label>
+                  <Select
+                    value={countryCode}
+                    onValueChange={(value) => setCountryCode(value as keyof typeof COUNTRY_CODES)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o país" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(COUNTRY_CODES).map(([code, country]) => (
+                        <SelectItem key={code} value={code}>
+                          {country.flag} {country.name} ({country.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    WhatsApp
+                  </label>
+                  <Input
+                    type="tel"
+                    placeholder={COUNTRY_CODES[countryCode].placeholder}
+                    value={whatsapp}
+                    onChange={(e) => {
+                      const formatted = formatPhone(e.target.value, countryCode);
+                      setWhatsapp(formatted);
+                    }}
+                    maxLength={countryCode === "BR" ? 15 : countryCode === "US" ? 14 : 13}
+                  />
+                </div>
+              </div>
+
+              <Button type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Search className="h-4 w-4" />
+                  <Search className="mr-2 h-4 w-4" />
                 )}
-                <span className="ml-2">Buscar</span>
+                Buscar Reservas
               </Button>
             </form>
           </CardContent>

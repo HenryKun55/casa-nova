@@ -22,14 +22,52 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCreateReserva } from "@/hooks/use-reservas";
 import { toast } from "sonner";
 import type { ProdutoComReserva } from "@/hooks/use-produtos";
 import { Loader2 } from "lucide-react";
 
+const COUNTRY_CODES = {
+  BR: { code: "+55", placeholder: "(11) 99999-9999", flag: "🇧🇷", name: "Brasil" },
+  US: { code: "+1", placeholder: "(999) 999-9999", flag: "🇺🇸", name: "EUA" },
+  AU: { code: "+61", placeholder: "0400 000 000", flag: "🇦🇺", name: "Austrália" },
+} as const;
+
+const formatPhone = (value: string, countryCode: keyof typeof COUNTRY_CODES): string => {
+  const numbers = value.replace(/\D/g, "");
+
+  if (countryCode === "BR") {
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  }
+
+  if (countryCode === "US") {
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
+    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+  }
+
+  if (countryCode === "AU") {
+    if (numbers.length <= 4) return numbers;
+    if (numbers.length <= 7) return `${numbers.slice(0, 4)} ${numbers.slice(4)}`;
+    return `${numbers.slice(0, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7, 10)}`;
+  }
+
+  return numbers;
+};
+
 const reservaFormSchema = z.object({
   nomeConvidado: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   emailConvidado: z.string().email("Email inválido").optional().or(z.literal("")),
+  countryCode: z.enum(["BR", "US", "AU"]),
   whatsapp: z.string().optional(),
   mensagem: z.string().optional(),
 });
@@ -51,18 +89,30 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
     defaultValues: {
       nomeConvidado: "",
       emailConvidado: "",
+      countryCode: "BR",
       whatsapp: "",
       mensagem: "",
     },
   });
 
+  const selectedCountry = form.watch("countryCode");
+
   const onSubmit = async (data: ReservaFormValues) => {
     if (!produto) return;
 
     try {
+      // Formata o WhatsApp com código do país
+      const country = COUNTRY_CODES[data.countryCode];
+      const whatsappFormatted = data.whatsapp
+        ? `${country.code} ${data.whatsapp}`
+        : "";
+
       await createReserva.mutateAsync({
         produtoId: produto.id,
-        ...data,
+        nomeConvidado: data.nomeConvidado,
+        emailConvidado: data.emailConvidado,
+        whatsapp: whatsappFormatted,
+        mensagem: data.mensagem,
       });
       setIsSuccess(true);
       toast.success("Presente reservado com sucesso! 🎉");
@@ -136,19 +186,58 @@ export function ReservaModal({ produto, open, onOpenChange }: ReservaModalProps)
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="whatsapp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>WhatsApp (opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="(11) 99999-9999" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="countryCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>País</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o país" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(COUNTRY_CODES).map(([code, country]) => (
+                              <SelectItem key={code} value={code}>
+                                {country.flag} {country.name} ({country.code})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>WhatsApp (opcional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="tel"
+                            placeholder={COUNTRY_CODES[selectedCountry].placeholder}
+                            onChange={(e) => {
+                              const formatted = formatPhone(e.target.value, selectedCountry);
+                              field.onChange(formatted);
+                            }}
+                            maxLength={selectedCountry === "BR" ? 15 : selectedCountry === "US" ? 14 : 13}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
