@@ -10,7 +10,7 @@ export default auth((req) => {
     }
 
     if (!req.auth.user?.isAdmin) {
-      return NextResponse.redirect(new URL("/lista", req.url));
+      return NextResponse.redirect(new URL("/list", req.url));
     }
   }
 

@@ -9,5 +9,4 @@ export const db = drizzle(sql, {
   schema: { ...schema, ...relations },
 });
 
-// Re-export schema types
 export * from "./schema";

@@ -11,10 +11,10 @@
     "prefix": ""
   },
   "aliases": {
-    "components": "@cha-casa-nova/components",
-    "utils": "@cha-casa-nova/lib/utils",
-    "ui": "@cha-casa-nova/components/ui",
-    "lib": "@cha-casa-nova/lib",
-    "hooks": "@cha-casa-nova/hooks"
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
   }
 }

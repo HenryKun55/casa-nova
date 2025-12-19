@@ -9,8 +9,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 
-// ==================== AUTH TABLES (NextAuth) ====================
-
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
@@ -19,7 +17,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: text("image"),
-  isAdmin: boolean("is_admin").notNull().default(false), // Só o casal tem true
+  isAdmin: boolean("is_admin").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
@@ -70,8 +68,6 @@ export const verificationTokens = pgTable(
   })
 );
 
-// ==================== APP TABLES ====================
-
 export const products = pgTable("products", {
   id: text("id")
     .primaryKey()
@@ -80,9 +76,9 @@ export const products = pgTable("products", {
   description: text("description"),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   color: text("color"),
-  purchaseLink: text("purchase_link"), // URL de onde comprar
-  imageUrl: text("image_url"), // URL da imagem uploadada
-  category: text("category"), // Ex: "Cozinha", "Quarto", "Banheiro"
+  purchaseLink: text("purchase_link"),
+  imageUrl: text("image_url"),
+  category: text("category"),
   quantity: integer("quantity").notNull().default(1),
   priority: integer("priority").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
@@ -100,12 +96,10 @@ export const reservations = pgTable("reservations", {
   guestName: text("guest_name").notNull(),
   guestEmail: text("guest_email"),
   whatsapp: text("whatsapp"),
-  message: text("message"), // Mensagem carinhosa opcional
-  confirmed: boolean("confirmed").notNull().default(false), // Casal pode confirmar recebimento
+  message: text("message"),
+  confirmed: boolean("confirmed").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
-
-// ==================== TYPES ====================
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;

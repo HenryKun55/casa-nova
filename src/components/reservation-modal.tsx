@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -33,46 +32,12 @@ import { useCreateReservation } from "@/hooks/use-reservations";
 import { toast } from "sonner";
 import type { ProductWithReservation } from "@/hooks/use-products";
 import { Loader2 } from "lucide-react";
-
-const COUNTRY_CODES = {
-  BR: { code: "+55", placeholder: "(11) 99999-9999", flag: "🇧🇷", name: "Brasil" },
-  US: { code: "+1", placeholder: "(999) 999-9999", flag: "🇺🇸", name: "EUA" },
-  AU: { code: "+61", placeholder: "0400 000 000", flag: "🇦🇺", name: "Austrália" },
-} as const;
-
-const formatPhone = (value: string, countryCode: keyof typeof COUNTRY_CODES): string => {
-  const numbers = value.replace(/\D/g, "");
-
-  if (countryCode === "BR") {
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
-  }
-
-  if (countryCode === "US") {
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
-    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
-  }
-
-  if (countryCode === "AU") {
-    if (numbers.length <= 4) return numbers;
-    if (numbers.length <= 7) return `${numbers.slice(0, 4)} ${numbers.slice(4)}`;
-    return `${numbers.slice(0, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7, 10)}`;
-  }
-
-  return numbers;
-};
-
-const reservationFormSchema = z.object({
-  guestName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  guestEmail: z.string().email("Email inválido").optional().or(z.literal("")),
-  countryCode: z.enum(["BR", "US", "AU"]),
-  whatsapp: z.string().optional(),
-  message: z.string().optional(),
-});
-
-type ReservationFormValues = z.infer<typeof reservationFormSchema>;
+import { COUNTRY_CODES } from "@/lib/constants/countries";
+import { formatPhone, getPhoneMaxLength } from "@/lib/utils/phone";
+import {
+  reservationFormSchema,
+  type ReservationFormValues
+} from "@/lib/validations/reservation";
 
 interface ReservationModalProps {
   product: ProductWithReservation | null;
@@ -101,7 +66,6 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
     if (!product) return;
 
     try {
-      // Formata o WhatsApp com código do país
       const country = COUNTRY_CODES[data.countryCode];
       const whatsappFormatted = data.whatsapp
         ? `${country.code} ${data.whatsapp}`
@@ -230,7 +194,7 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
                               const formatted = formatPhone(e.target.value, selectedCountry);
                               field.onChange(formatted);
                             }}
-                            maxLength={selectedCountry === "BR" ? 15 : selectedCountry === "US" ? 14 : 13}
+                            maxLength={getPhoneMaxLength(selectedCountry)}
                           />
                         </FormControl>
                         <FormMessage />
