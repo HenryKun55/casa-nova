@@ -16,6 +16,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { FadeIn } from "@/components/ui/fade-in";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { motion } from "framer-motion";
+import { SyncStatus } from "@/components/sync-status";
 
 export default function ListPage() {
   const { data: products, isLoading } = useProducts();
@@ -54,6 +55,7 @@ export default function ListPage() {
               </p>
             </div>
             <div className="flex gap-2 items-center">
+              <SyncStatus />
               <ThemeToggle />
               <Link href="/">
                 <Button variant="outline">Voltar ao Início</Button>

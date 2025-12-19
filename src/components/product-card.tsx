@@ -37,6 +37,7 @@ export function ProductCard({ product, onReserve, isAdmin = false }: ProductCard
       window.removeEventListener('anonymousModeChanged', handleAnonymousModeChange);
     };
   }, []);
+
   const formattedPrice = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
