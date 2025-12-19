@@ -37,9 +37,16 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 interface ProductFormProps {
   product?: ProductWithReservation;
   onSuccess?: () => void;
+  initialData?: {
+    name?: string;
+    price?: string;
+    imageUrl?: string;
+    purchaseLink?: string;
+    category?: string | null;
+  };
 }
 
-export function ProductForm({ product, onSuccess }: ProductFormProps) {
+export function ProductForm({ product, onSuccess, initialData }: ProductFormProps) {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct(product?.id || "");
   const isEditing = !!product;
@@ -47,13 +54,17 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      name: product?.name || "",
+      name: initialData?.name || product?.name || "",
       description: product?.description || "",
-      price: product ? formatCurrencyInput((parseFloat(product.price) * 100).toString()) : "",
+      price: initialData?.price
+        ? formatCurrencyInput((parseFloat(initialData.price) * 100).toString())
+        : product
+        ? formatCurrencyInput((parseFloat(product.price) * 100).toString())
+        : "",
       color: product?.color || "",
-      purchaseLink: product?.purchaseLink || "",
-      imageUrl: product?.imageUrl || "",
-      category: product?.category || "",
+      purchaseLink: initialData?.purchaseLink || product?.purchaseLink || "",
+      imageUrl: initialData?.imageUrl || product?.imageUrl || "",
+      category: initialData?.category || product?.category || "",
       quantity: product?.quantity || 1,
       priority: product?.priority || 0,
     },

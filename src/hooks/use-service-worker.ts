@@ -17,7 +17,6 @@ export function useServiceWorker() {
 
         console.log("Service Worker registered:", registration);
 
-        // Check for updates
         registration.addEventListener("updatefound", () => {
           const newWorker = registration.installing;
 
@@ -27,7 +26,6 @@ export function useServiceWorker() {
                 newWorker.state === "installed" &&
                 navigator.serviceWorker.controller
               ) {
-                // New service worker available
                 toast.info("Nova versão disponível! Recarregue a página para atualizar.", {
                   duration: 10000,
                   action: {

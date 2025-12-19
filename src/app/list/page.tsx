@@ -42,16 +42,16 @@ export default function ListPage() {
   const progress = totalProducts > 0 ? (reservedProducts / totalProducts) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-slate-950 dark:to-green-950">
       <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-primary">
-                Chá de Casa Nova
+                Nosso Lar dos Sonhos
               </h1>
               <p className="text-muted-foreground">
-                Escolha um presente especial para nós
+                Ajude a gente a mobiliar nosso cantinho com amor
               </p>
             </div>
             <div className="flex gap-2 items-center">
@@ -73,14 +73,14 @@ export default function ListPage() {
             transition={{ duration: 0.2 }}
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-medium">Progresso da Lista</span>
+              <span className="text-sm font-medium">Nossa Jornada</span>
               <span className="text-sm text-muted-foreground">
-                <AnimatedCounter value={reservedProducts} /> de <AnimatedCounter value={totalProducts} /> presentes reservados
+                <AnimatedCounter value={reservedProducts} /> de <AnimatedCounter value={totalProducts} /> itens já garantidos
               </span>
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-rose-100 dark:bg-rose-950">
+            <div className="h-3 overflow-hidden rounded-full bg-orange-100 dark:bg-orange-950">
               <motion.div
-                className="h-full bg-rose-500 dark:bg-rose-600"
+                className="h-full bg-primary dark:bg-primary"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}

@@ -22,7 +22,6 @@ export function useCreateReservation() {
 
   return useMutation({
     mutationFn: async (data: CreateReservationInput) => {
-      // Optimistic update: save to local DB immediately
       const tempId = `temp_${Date.now()}`;
       const localReservation = {
         id: tempId,
@@ -37,13 +36,11 @@ export function useCreateReservation() {
         _syncStatus: "pending" as const,
       };
 
-      // Import db dynamically to avoid SSR issues
       const { db } = await import("@/lib/db/local-db");
       const { syncManager } = await import("@/lib/sync/sync-manager");
 
       await db.reservations.add(localReservation);
 
-      // If online, try to send to server
       if (navigator.onLine) {
         try {
           const res = await fetch("/api/reservations", {
@@ -59,7 +56,6 @@ export function useCreateReservation() {
 
           const serverReservation = await res.json();
 
-          // Update local DB with server ID
           await db.reservations.delete(tempId);
           await db.reservations.add({
             ...serverReservation,
@@ -70,12 +66,10 @@ export function useCreateReservation() {
 
           return serverReservation;
         } catch (error) {
-          // Add to sync queue if failed
           await syncManager.addToQueue("create", "reservation", tempId, data);
           throw error;
         }
       } else {
-        // Offline: add to sync queue
         await syncManager.addToQueue("create", "reservation", tempId, data);
         return localReservation;
       }
@@ -101,7 +95,16 @@ export function useUpdateReservation() {
         const error = await res.json();
         throw new Error(error.error || "Erro ao atualizar reserva");
       }
-      return res.json();
+      const updatedReservation = await res.json();
+
+      const { db } = await import("@/lib/db/local-db");
+      await db.reservations.update(id, {
+        ...data,
+        _syncStatus: "synced" as const,
+        _lastSync: new Date().toISOString(),
+      });
+
+      return updatedReservation;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations"] });

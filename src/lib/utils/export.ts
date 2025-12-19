@@ -25,7 +25,6 @@ export function exportReservationsToExcel(reservations: ReservationWithProduct[]
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Reservas");
 
-  // Auto-size columns
   const maxWidths: { [key: string]: number } = {};
   data.forEach((row) => {
     Object.keys(row).forEach((key) => {

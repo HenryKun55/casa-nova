@@ -88,22 +88,19 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
       toast.success("Presente reservado com sucesso! 🎉");
       form.reset();
 
-      // Confetti!
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#f43f5e', '#fb923c', '#fbbf24', '#a3e635', '#34d399']
+        colors: ['#FF6B4A', '#F97316', '#FCD34D', '#2D5F4F', '#059669'] // Cores Quinta das Alamedas
       });
 
-      // Se tem Pix configurado, abre o modal do Pix
       if (hasPixConfigured) {
         setTimeout(() => {
           setIsSuccess(false);
           setShowPixModal(true);
         }, 2000);
       } else {
-        // Senão, apenas fecha o modal
         setTimeout(() => {
           onOpenChange(false);
           setIsSuccess(false);
@@ -133,18 +130,18 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
           {isSuccess ? (
             <div className="py-8 text-center">
               <div className="mb-4 text-6xl">🎉</div>
-              <DialogTitle className="mb-2 text-2xl">Obrigado!</DialogTitle>
+              <DialogTitle className="mb-2 text-2xl">Muito obrigado!</DialogTitle>
               <DialogDescription>
                 {hasPixConfigured
-                  ? "Seu presente foi reservado! Agora você pode realizar o pagamento via Pix."
-                  : "Seu presente foi reservado com sucesso. O casal vai adorar!"
+                  ? "Sua contribuição foi reservada com muito carinho! Você pode fazer o Pix agora se quiser ❤️"
+                  : "Sua contribuição foi guardada com muito carinho! A gente vai amar! ❤️"
                 }
               </DialogDescription>
             </div>
           ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Reservar Presente</DialogTitle>
+              <DialogTitle>Contribuir com Este Item</DialogTitle>
               <DialogDescription>
                 {product.name} • {formattedPrice}
               </DialogDescription>

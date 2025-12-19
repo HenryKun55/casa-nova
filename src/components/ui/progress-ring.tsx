@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 interface ProgressRingProps {
-  progress: number; // 0-100
+  progress: number;
   size?: number;
   strokeWidth?: number;
   className?: string;

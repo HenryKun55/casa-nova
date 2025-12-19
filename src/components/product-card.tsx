@@ -82,7 +82,7 @@ export function ProductCard({ product, onReserve, isAdmin = false }: ProductCard
             {isReserved && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm pointer-events-none">
                 <Badge variant="secondary" className="text-lg shadow-lg">
-                  Reservado
+                  Já garantido ✓
                 </Badge>
               </div>
             )}
@@ -123,14 +123,14 @@ export function ProductCard({ product, onReserve, isAdmin = false }: ProductCard
         {!isReserved && onReserve && (
           <Button onClick={() => onReserve(product)} className="flex-1">
             <Gift className="mr-2 h-4 w-4" />
-            Quero dar esse!
+            Quero contribuir!
           </Button>
         )}
         {isReserved && product.reservation && (
           <div className="flex-1 text-sm text-muted-foreground">
             {isAdmin || !anonymousMode
-              ? `Reservado por: ${product.reservation.guestName}`
-              : "Reservado"}
+              ? `Garantido por: ${product.reservation.guestName} ❤️`
+              : "Já garantido ❤️"}
           </div>
         )}
         {product.purchaseLink && (

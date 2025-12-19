@@ -20,9 +20,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Sparkles, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ProductForm } from "@/components/product-form";
 import { ProductCard } from "@/components/product-card";
+import { ProductSearchModal } from "@/components/product-search-modal";
 import { toast } from "sonner";
 import type { ProductWithReservation } from "@/hooks/use-products";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,8 +39,10 @@ export default function ProductsPage() {
   const deleteProduct = useDeleteProduct();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductWithReservation | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<ProductWithReservation | null>(null);
+  const [prefilledData, setPrefilledData] = useState<any>(null);
 
   const handleDelete = async () => {
     if (!deletingProduct) return;
@@ -50,17 +59,32 @@ export default function ProductsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Gerenciar Produtos</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Gerenciar Produtos</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Adicione, edite ou remova produtos da sua lista
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Produto
-        </Button>
+        <div className="flex gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsSearchModalOpen(true)}
+            className="flex-1 sm:flex-none"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Buscar com IA
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="flex-1 sm:flex-none"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Produto
+          </Button>
+        </div>
       </div>
 
       {/* Products Grid */}
@@ -79,26 +103,34 @@ export default function ProductsPage() {
           {products.map((product) => (
             <div key={product.id} className="relative">
               <ProductCard product={product} isAdmin />
-              <div className="mt-2 flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => setEditingProduct(product)}
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Editar
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={() => setDeletingProduct(product)}
-                  disabled={!!product.reservation}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Deletar
-                </Button>
+
+              {/* Menu de ações no canto superior direito */}
+              <div className="absolute top-2 right-2 z-10">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background shadow-md"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => setEditingProduct(product)}>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setDeletingProduct(product)}
+                      disabled={!!product.reservation}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Deletar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           ))}
@@ -115,8 +147,21 @@ export default function ProductsPage() {
         </div>
       )}
 
+      {/* Search Modal with AI */}
+      <ProductSearchModal
+        open={isSearchModalOpen}
+        onOpenChange={setIsSearchModalOpen}
+        onSelectProduct={(product) => {
+          setPrefilledData(product);
+          setIsCreateDialogOpen(true);
+        }}
+      />
+
       {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
+        setIsCreateDialogOpen(open);
+        if (!open) setPrefilledData(null);
+      }}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Novo Produto</DialogTitle>
@@ -124,7 +169,13 @@ export default function ProductsPage() {
               Adicione um novo produto à sua lista de presentes
             </DialogDescription>
           </DialogHeader>
-          <ProductForm onSuccess={() => setIsCreateDialogOpen(false)} />
+          <ProductForm
+            onSuccess={() => {
+              setIsCreateDialogOpen(false);
+              setPrefilledData(null);
+            }}
+            initialData={prefilledData}
+          />
         </DialogContent>
       </Dialog>
 

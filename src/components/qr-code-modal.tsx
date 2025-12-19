@@ -115,7 +115,6 @@ export function QRCodeModal({
         });
         toast.success("Compartilhado com sucesso!");
       } catch (error) {
-        // User cancelled share
       }
     } else {
       handleCopyLink();

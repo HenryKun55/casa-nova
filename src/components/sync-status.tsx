@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 import { useOnline } from "@/hooks/use-online";
 import { syncManager } from "@/lib/sync/sync-manager";
 import { Badge } from "@/components/ui/badge";
-import { Cloud, CloudOff, Loader2, Check } from "lucide-react";
+import { Cloud, CloudOff, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function SyncStatus() {
   const isOnline = useOnline();
   const [pendingCount, setPendingCount] = useState(0);
-  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     const updatePendingCount = async () => {
@@ -26,7 +25,7 @@ export function SyncStatus() {
 
   useEffect(() => {
     if (isOnline) {
-      syncManager.startAutoSync(30000); // Sync every 30 seconds
+      syncManager.startAutoSync(30000); 
     }
 
     return () => {

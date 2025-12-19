@@ -40,7 +40,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-rose-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-slate-950 dark:via-green-950 dark:to-slate-900">
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
@@ -63,7 +63,7 @@ export default function HomePage() {
           </FadeIn>
           <FadeIn delay={0.3}>
             <p className="mb-8 text-xl text-muted-foreground md:text-2xl">
-              Estamos construindo nosso lar e você faz parte dessa história
+              Estamos começando nossa jornada juntos na Quinta das Alamedas e você faz parte desse sonho ❤️
             </p>
           </FadeIn>
 
@@ -106,7 +106,7 @@ export default function HomePage() {
                 <Link href="/list">
                   <Button size="lg" className="w-full sm:w-auto">
                     <Gift className="mr-2 h-5 w-5" />
-                    Ver Lista de Presentes
+                    Ver Nossos Sonhos
                   </Button>
                 </Link>
               </motion.div>
@@ -114,7 +114,7 @@ export default function HomePage() {
                 <Link href="/my-reservations">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
                     <Search className="mr-2 h-5 w-5" />
-                    Consultar Minhas Reservas
+                    Minhas Contribuições
                   </Button>
                 </Link>
               </motion.div>
@@ -135,9 +135,9 @@ export default function HomePage() {
 
         <div className="mt-24 grid gap-8 md:grid-cols-3">
           {[
-            { icon: Gift, title: "Escolha seu Presente", desc: "Navegue pela nossa lista e escolha o presente perfeito", delay: 1.1 },
-            { icon: Heart, title: "Reserve Online", desc: "Reserve seu presente de forma rápida e fácil", delay: 1.2 },
-            { icon: Home, title: "Ajude a Construir", desc: "Faça parte da construção do nosso primeiro lar", delay: 1.3 }
+            { icon: Gift, title: "Escolha com Carinho", desc: "Veja o que precisamos para começar nossa vida juntos", delay: 1.1 },
+            { icon: Heart, title: "Contribua com Amor", desc: "Sua ajuda faz toda diferença no nosso começo", delay: 1.2 },
+            { icon: Home, title: "Construa Conosco", desc: "Cada presente é um tijolo no nosso lar", delay: 1.3 }
           ].map((item) => (
             <FadeIn key={item.title} delay={item.delay}>
               <motion.div
@@ -162,7 +162,10 @@ export default function HomePage() {
 
       <footer className="border-t bg-background/50 backdrop-blur-sm py-8 text-center">
         <p className="text-sm text-muted-foreground">
-          Feito com <Heart className="inline h-4 w-4 text-primary" /> para nosso Chá de Casa Nova
+          Feito com <Heart className="inline h-4 w-4 text-primary fill-primary" /> por Henrique & Yasmim
+        </p>
+        <p className="text-xs text-muted-foreground mt-2">
+          Nosso cantinho na Quinta das Alamedas
         </p>
       </footer>
     </div>

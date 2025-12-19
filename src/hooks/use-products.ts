@@ -12,12 +12,9 @@ export function useProducts() {
   return useQuery<ProductWithReservation[]>({
     queryKey: ["products"],
     queryFn: async () => {
-      // 1. Try to get from local database first (local-first)
       const localProducts = await db.products.toArray();
 
-      // 2. If we have local data, return it immediately
       if (localProducts.length > 0) {
-        // Convert LocalProduct to ProductWithReservation
         const productsWithReservations = await Promise.all(
           localProducts.map(async (product) => {
             const reservation = product.reservation || await db.reservations.get(product.id);
@@ -33,14 +30,12 @@ export function useProducts() {
           })
         );
 
-        // 3. Try to sync in background if online
         if (navigator.onLine) {
           fetch("/api/products")
             .then(async (res) => {
               if (res.ok) {
                 const serverProducts = await res.json();
 
-                // Update local database
                 await db.products.clear();
                 await db.products.bulkAdd(
                   serverProducts.map((p: ProductWithReservation) => ({
@@ -62,13 +57,11 @@ export function useProducts() {
         return productsWithReservations;
       }
 
-      // 4. If no local data and online, fetch from server
       if (navigator.onLine) {
         const res = await fetch("/api/products");
         if (!res.ok) throw new Error("Erro ao carregar produtos");
         const products = await res.json();
 
-        // Store in local database
         await db.products.bulkAdd(
           products.map((p: ProductWithReservation) => ({
             ...p,
@@ -83,7 +76,6 @@ export function useProducts() {
         return products;
       }
 
-      // 5. Offline and no local data
       throw new Error("Você está offline e não há dados salvos localmente");
     },
   });
@@ -115,7 +107,18 @@ export function useCreateProduct() {
         const error = await res.json();
         throw new Error(error.error || "Erro ao criar produto");
       }
-      return res.json();
+      const newProduct = await res.json();
+
+      await db.products.add({
+        ...newProduct,
+        createdAt: new Date(newProduct.createdAt).toISOString(),
+        updatedAt: new Date(newProduct.updatedAt).toISOString(),
+        reservation: newProduct.reservation,
+        _syncStatus: "synced" as const,
+        _lastSync: new Date().toISOString(),
+      });
+
+      return newProduct;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -137,7 +140,18 @@ export function useUpdateProduct(id: string) {
         const error = await res.json();
         throw new Error(error.error || "Erro ao atualizar produto");
       }
-      return res.json();
+      const updatedProduct = await res.json();
+
+      await db.products.update(id, {
+        ...updatedProduct,
+        createdAt: new Date(updatedProduct.createdAt).toISOString(),
+        updatedAt: new Date(updatedProduct.updatedAt).toISOString(),
+        reservation: updatedProduct.reservation,
+        _syncStatus: "synced" as const,
+        _lastSync: new Date().toISOString(),
+      });
+
+      return updatedProduct;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -158,6 +172,9 @@ export function useDeleteProduct() {
         const error = await res.json();
         throw new Error(error.error || "Erro ao deletar produto");
       }
+
+      await db.products.delete(id);
+
       return res.json();
     },
     onSuccess: () => {

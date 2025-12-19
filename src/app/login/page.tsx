@@ -12,7 +12,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-100 dark:from-slate-950 dark:to-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-100 dark:from-slate-950 dark:to-green-950 p-4">
       <FadeIn delay={0.2}>
         <motion.div
           initial={{ scale: 0.9, y: 20 }}
