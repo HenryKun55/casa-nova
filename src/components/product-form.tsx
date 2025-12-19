@@ -16,13 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useCreateProduct, useUpdateProduct, type ProductWithReservation } from "@/hooks/use-products";
+import { formatCurrencyInput, parseCurrency } from "@/lib/utils/format";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const productFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   description: z.string().optional(),
-  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preço inválido (use formato: 99.99)"),
+  price: z.string().min(1, "Preço é obrigatório"),
   color: z.string().optional(),
   purchaseLink: z.url("Link inválido").optional().or(z.literal("")),
   imageUrl: z.url("URL da imagem inválida").optional().or(z.literal("")),
@@ -48,7 +49,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     defaultValues: {
       name: product?.name || "",
       description: product?.description || "",
-      price: product?.price || "",
+      price: product ? formatCurrencyInput((parseFloat(product.price) * 100).toString()) : "",
       color: product?.color || "",
       purchaseLink: product?.purchaseLink || "",
       imageUrl: product?.imageUrl || "",
@@ -60,11 +61,18 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
+      const priceValue = parseCurrency(data.price);
+
+      const productData = {
+        ...data,
+        price: priceValue.toFixed(2),
+      };
+
       if (isEditing) {
-        await updateProduct.mutateAsync(data);
+        await updateProduct.mutateAsync(productData);
         toast.success("Produto atualizado com sucesso!");
       } else {
-        await createProduct.mutateAsync(data);
+        await createProduct.mutateAsync(productData);
         toast.success("Produto criado com sucesso!");
         form.reset();
       }
@@ -101,9 +109,17 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               <FormItem>
                 <FormLabel>Preço *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: 199.90" {...field} />
+                  <Input
+                    placeholder="R$ 0,00"
+                    {...field}
+                    onChange={(e) => {
+                      const formatted = formatCurrencyInput(e.target.value);
+                      field.onChange(formatted);
+                    }}
+                    className="font-medium"
+                  />
                 </FormControl>
-                <FormDescription>Use ponto para separar centavos</FormDescription>
+                <FormDescription>Digite o valor em reais</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

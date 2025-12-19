@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,23 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onReserve, isAdmin = false }: ProductCardProps) {
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  const [anonymousMode, setAnonymousMode] = useState(getAnonymousMode());
   const isReserved = !!product.reservation;
   const priorityLevel = getPriorityLevel(product.priority);
-  const anonymousMode = getAnonymousMode();
+
+  useEffect(() => {
+    const handleAnonymousModeChange = () => {
+      setAnonymousMode(getAnonymousMode());
+    };
+
+    window.addEventListener('storage', handleAnonymousModeChange);
+    window.addEventListener('anonymousModeChanged', handleAnonymousModeChange);
+
+    return () => {
+      window.removeEventListener('storage', handleAnonymousModeChange);
+      window.removeEventListener('anonymousModeChanged', handleAnonymousModeChange);
+    };
+  }, []);
   const formattedPrice = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",

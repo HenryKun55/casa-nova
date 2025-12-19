@@ -8,16 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { Package, Gift, DollarSign, CheckCircle, Target, QrCode, Settings } from "lucide-react";
+import { Package, Gift, DollarSign, CheckCircle, Target, QrCode } from "lucide-react";
 import Link from "next/link";
 import { APP_CONFIG } from "@/lib/constants/app-config";
 import { QRCodeModal } from "@/components/qr-code-modal";
-import { SettingsModal } from "@/components/settings-modal";
 import { fireGoalConfetti } from "@/lib/utils/confetti";
 
 export default function DashboardPage() {
   const [qrModalOpen, setQrModalOpen] = useState(false);
-  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const hasShownConfetti = useRef(false);
   const { data: products, isLoading: loadingProducts } = useProducts();
   const { data: reservations, isLoading: loadingReservations } = useReservations();
@@ -68,33 +66,19 @@ export default function DashboardPage() {
         title="Compartilhar Lista de Presentes"
         description="Compartilhe este QR Code com seus convidados para que eles possam acessar a lista"
       />
-      <SettingsModal
-        open={settingsModalOpen}
-        onOpenChange={setSettingsModalOpen}
-      />
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
             Gerencie sua lista de chá de casa nova
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={() => setSettingsModalOpen(true)}>
-            <Settings className="h-4 w-4" />
+        <div className="flex gap-2 flex-shrink-0">
+          <Button variant="outline" size="icon" onClick={() => setQrModalOpen(true)} title="QR Code">
+            <QrCode className="h-4 w-4" />
           </Button>
-          <Button variant="outline" onClick={() => setQrModalOpen(true)}>
-            <QrCode className="mr-2 h-4 w-4" />
-            QR Code
-          </Button>
-          <Link href="/dashboard/products">
-            <Button>
-              <Package className="mr-2 h-4 w-4" />
-              Gerenciar Produtos
-            </Button>
-          </Link>
         </div>
       </div>
 

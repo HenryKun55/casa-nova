@@ -1,15 +1,38 @@
-/**
- * Application configuration
- * Centralized settings for the gift registry app
- */
+function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
+  if (typeof window === "undefined") return defaultValue;
+  const stored = localStorage.getItem(key);
+  if (stored === null) return defaultValue;
+
+  if (typeof defaultValue === "number") {
+    const parsed = parseFloat(stored);
+    return (isNaN(parsed) ? defaultValue : parsed) as T;
+  }
+
+  return stored as T;
+}
 
 export const APP_CONFIG = {
-  fundraisingGoal: 15000,
+  get fundraisingGoal(): number {
+    return loadFromLocalStorage("fundraisingGoal", 15000);
+  },
+  set fundraisingGoal(value: number) {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fundraisingGoal", value.toString());
+    }
+  },
 
   event: {
     name: "Chá de Casa Nova",
     couple: "Henrique & Yasmim",
-    date: new Date("2025-06-15"),
+    get date(): Date {
+      const stored = loadFromLocalStorage("eventDate", "2025-06-15");
+      return new Date(stored);
+    },
+    set date(value: Date) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("eventDate", value.toISOString().split('T')[0]);
+      }
+    },
   },
 
   features: {
@@ -28,5 +51,6 @@ export function getAnonymousMode(): boolean {
 export function setAnonymousMode(enabled: boolean): void {
   if (typeof window !== "undefined") {
     localStorage.setItem("anonymousMode", enabled.toString());
+    window.dispatchEvent(new Event('anonymousModeChanged'));
   }
 }
