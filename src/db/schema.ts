@@ -101,6 +101,17 @@ export const reservations = pgTable("reservations", {
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const activityLog = pgTable("activity_log", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  type: text("type").notNull(),
+  description: text("description").notNull(),
+  userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -109,3 +120,6 @@ export type NewProduct = typeof products.$inferInsert;
 
 export type Reservation = typeof reservations.$inferSelect;
 export type NewReservation = typeof reservations.$inferInsert;
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type NewActivityLog = typeof activityLog.$inferInsert;

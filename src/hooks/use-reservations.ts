@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Reservation, Product } from "@/db/schema";
-import type { CreateReservationInput } from "@/lib/validations/reservation";
+import type { CreateReservationInput, UpdateReservationInput } from "@/lib/validations/reservation";
 
 export type ReservationWithProduct = Reservation & {
   product: Product;
@@ -30,6 +30,29 @@ export function useCreateReservation() {
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Erro ao criar reserva");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+}
+
+export function useUpdateReservation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...data }: UpdateReservationInput & { id: string }) => {
+      const res = await fetch(`/api/reservations/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Erro ao atualizar reserva");
       }
       return res.json();
     },

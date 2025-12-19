@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Search, CheckCircle2, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const COUNTRY_CODES = {
   BR: { code: "+55", placeholder: "(11) 99999-9999", flag: "🇧🇷", name: "Brasil" },
@@ -115,20 +116,23 @@ export default function MyReservationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white dark:from-slate-950 dark:to-slate-900 py-12 px-4">
       <div className="container mx-auto max-w-4xl">
-        <Link href="/">
-          <Button variant="ghost" className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar para a lista
-          </Button>
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/">
+            <Button variant="ghost">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar para a lista
+            </Button>
+          </Link>
+          <ThemeToggle />
+        </div>
 
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold text-gray-900">
+          <h1 className="mb-2 text-4xl font-bold">
             Minhas Reservas
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-muted-foreground">
             Consulte os presentes que você reservou
           </p>
         </div>

@@ -6,10 +6,13 @@ import { ProductCard } from "@/components/product-card";
 import { ReservationModal } from "@/components/reservation-modal";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, Grid3x3 } from "lucide-react";
 import type { ProductWithReservation } from "@/hooks/use-products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getCategoryInfo } from "@/lib/constants/categories";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function ListPage() {
   const { data: products, isLoading } = useProducts();
@@ -35,38 +38,39 @@ export default function ListPage() {
   const progress = totalProducts > 0 ? (reservedProducts / totalProducts) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 dark:from-slate-950 dark:to-slate-900">
+      <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-rose-600">
+              <h1 className="text-3xl font-bold text-primary">
                 Chá de Casa Nova
               </h1>
               <p className="text-muted-foreground">
                 Escolha um presente especial para nós
               </p>
             </div>
-            <Link href="/">
-              <Button variant="outline">Voltar ao Início</Button>
-            </Link>
+            <div className="flex gap-2 items-center">
+              <ThemeToggle />
+              <Link href="/">
+                <Button variant="outline">Voltar ao Início</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Progresso */}
-        <div className="mb-8 rounded-lg bg-white p-6 shadow-sm">
+        <div className="mb-8 rounded-lg bg-card p-6 shadow-sm border">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium">Progresso da Lista</span>
             <span className="text-sm text-muted-foreground">
               {reservedProducts} de {totalProducts} presentes reservados
             </span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-rose-100">
+          <div className="h-3 overflow-hidden rounded-full bg-rose-100 dark:bg-rose-950">
             <div
-              className="h-full bg-rose-500 transition-all duration-500"
+              className="h-full bg-rose-500 dark:bg-rose-600 transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -85,24 +89,43 @@ export default function ListPage() {
           </div>
 
           {categories.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={selectedCategory === null ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(null)}
-              >
-                Todas
-              </Button>
-              {categories.map((category) => (
+            <div>
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-medium">
+                <Grid3x3 className="h-4 w-4" />
+                Categorias
+              </h3>
+              <div className="flex flex-wrap gap-2">
                 <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
+                  variant={selectedCategory === null ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => setSelectedCategory(null)}
+                  className="gap-1"
                 >
-                  {category}
+                  <span>✨</span>
+                  Todas
                 </Button>
-              ))}
+                {categories.map((category) => {
+                  const categoryInfo = getCategoryInfo(category);
+                  const Icon = categoryInfo.icon;
+                  return (
+                    <Button
+                      key={category}
+                      variant={selectedCategory === category ? "default" : "outline"}
+                      size="sm"
+                      className="gap-1"
+                      onClick={() => setSelectedCategory(category)}
+                    >
+                      <span>{categoryInfo.emoji}</span>
+                      {category}
+                      {selectedCategory === category && (
+                        <Badge variant="secondary" className="ml-1 h-5 px-1 text-xs">
+                          {filteredProducts?.filter(p => p.category === category).length}
+                        </Badge>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

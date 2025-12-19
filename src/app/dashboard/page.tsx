@@ -1,14 +1,24 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/use-products";
 import { useReservations } from "@/hooks/use-reservations";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, Gift, DollarSign, CheckCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Package, Gift, DollarSign, CheckCircle, Target, QrCode, Settings } from "lucide-react";
 import Link from "next/link";
+import { APP_CONFIG } from "@/lib/constants/app-config";
+import { QRCodeModal } from "@/components/qr-code-modal";
+import { SettingsModal } from "@/components/settings-modal";
+import { fireGoalConfetti } from "@/lib/utils/confetti";
 
 export default function DashboardPage() {
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const hasShownConfetti = useRef(false);
   const { data: products, isLoading: loadingProducts } = useProducts();
   const { data: reservations, isLoading: loadingReservations } = useReservations();
 
@@ -33,7 +43,35 @@ export default function DashboardPage() {
       currency: "BRL",
     }).format(value);
 
+  const goalProgress = (reservedValue / APP_CONFIG.fundraisingGoal) * 100;
+  const isGoalReached = reservedValue >= APP_CONFIG.fundraisingGoal;
+
+  const listUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/list`
+    : "";
+
+  useEffect(() => {
+    if (isGoalReached && !isLoading && !hasShownConfetti.current) {
+      hasShownConfetti.current = true;
+      setTimeout(() => {
+        fireGoalConfetti();
+      }, 500);
+    }
+  }, [isGoalReached, isLoading]);
+
   return (
+    <>
+      <QRCodeModal
+        open={qrModalOpen}
+        onOpenChange={setQrModalOpen}
+        url={listUrl}
+        title="Compartilhar Lista de Presentes"
+        description="Compartilhe este QR Code com seus convidados para que eles possam acessar a lista"
+      />
+      <SettingsModal
+        open={settingsModalOpen}
+        onOpenChange={setSettingsModalOpen}
+      />
     <div className="space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
@@ -43,12 +81,21 @@ export default function DashboardPage() {
             Gerencie sua lista de chá de casa nova
           </p>
         </div>
-        <Link href="/dashboard/products">
-          <Button>
-            <Package className="mr-2 h-4 w-4" />
-            Gerenciar Produtos
+        <div className="flex gap-2">
+          <Button variant="outline" size="icon" onClick={() => setSettingsModalOpen(true)}>
+            <Settings className="h-4 w-4" />
           </Button>
-        </Link>
+          <Button variant="outline" onClick={() => setQrModalOpen(true)}>
+            <QrCode className="mr-2 h-4 w-4" />
+            QR Code
+          </Button>
+          <Link href="/dashboard/products">
+            <Button>
+              <Package className="mr-2 h-4 w-4" />
+              Gerenciar Produtos
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -134,10 +181,85 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      {/* Fundraising Goal Progress */}
+      <Card className={isGoalReached ? "border-green-500 bg-green-50/50" : ""}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Meta de Arrecadação
+              </CardTitle>
+              <CardDescription>
+                Acompanhe o progresso da sua lista de presentes
+              </CardDescription>
+            </div>
+            {isGoalReached && (
+              <div className="text-4xl">🎉</div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {isLoading ? (
+            <>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-8 w-48" />
+            </>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Progresso</span>
+                  <span className="font-medium">
+                    {Math.min(goalProgress, 100).toFixed(1)}%
+                  </span>
+                </div>
+                <Progress
+                  value={Math.min(goalProgress, 100)}
+                  className={`h-4 ${isGoalReached ? "bg-green-200" : ""}`}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(reservedValue)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    de {formatCurrency(APP_CONFIG.fundraisingGoal)}
+                  </p>
+                </div>
+                {isGoalReached ? (
+                  <div className="text-right">
+                    <p className="text-lg font-semibold text-green-600">
+                      Meta Atingida! 🎊
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatCurrency(reservedValue - APP_CONFIG.fundraisingGoal)} acima da meta
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Faltam</p>
+                    <p className="text-lg font-semibold">
+                      {formatCurrency(APP_CONFIG.fundraisingGoal - reservedValue)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Recent Reservations */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Reservas Recentes</CardTitle>
+          <Link href="/dashboard/reservations">
+            <Button variant="outline" size="sm">
+              Ver Todas
+            </Button>
+          </Link>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -157,16 +279,45 @@ export default function DashboardPage() {
               {reservations.slice(0, 5).map((reservation) => (
                 <div
                   key={reservation.id}
-                  className="flex items-center justify-between border-b pb-4 last:border-0"
+                  className="border-b pb-4 last:border-0 space-y-2"
                 >
-                  <div>
-                    <p className="font-medium">{reservation.guestName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {reservation.product.name} • {formatCurrency(Number(reservation.product.price))}
-                    </p>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(reservation.createdAt).toLocaleDateString("pt-BR")}
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium">{reservation.guestName}</p>
+                        <Badge
+                          variant={reservation.confirmed ? "default" : "secondary"}
+                          className={
+                            reservation.confirmed
+                              ? "bg-green-500 hover:bg-green-600 text-white"
+                              : ""
+                          }
+                        >
+                          {reservation.confirmed ? "Confirmado" : "Pendente"}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {reservation.product.name} • {formatCurrency(Number(reservation.product.price))}
+                      </p>
+                      {reservation.guestEmail && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          📧 {reservation.guestEmail}
+                        </p>
+                      )}
+                      {reservation.whatsapp && (
+                        <p className="text-xs text-muted-foreground">
+                          📱 {reservation.whatsapp}
+                        </p>
+                      )}
+                      {reservation.message && (
+                        <p className="text-xs text-muted-foreground italic mt-1">
+                          "{reservation.message}"
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-sm text-muted-foreground text-right">
+                      {new Date(reservation.createdAt).toLocaleDateString("pt-BR")}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -179,5 +330,6 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
