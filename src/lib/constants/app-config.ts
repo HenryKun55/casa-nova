@@ -40,6 +40,33 @@ export const APP_CONFIG = {
     pixIntegration: false,
     multipleImages: false,
   },
+
+  pix: {
+    get key(): string {
+      return loadFromLocalStorage("pixKey", "");
+    },
+    set key(value: string) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pixKey", value);
+      }
+    },
+    get name(): string {
+      return loadFromLocalStorage("pixName", "");
+    },
+    set name(value: string) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pixName", value);
+      }
+    },
+    get city(): string {
+      return loadFromLocalStorage("pixCity", "");
+    },
+    set city(value: string) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pixCity", value);
+      }
+    },
+  },
 };
 
 export function getAnonymousMode(): boolean {

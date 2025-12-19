@@ -21,7 +21,10 @@ export const createReservationSchema = insertReservationSchema.omit({
 });
 
 export const updateReservationSchema = z.object({
-  confirmed: z.boolean(),
+  confirmed: z.boolean().optional(),
+  paid: z.boolean().optional(),
+}).refine((data) => data.confirmed !== undefined || data.paid !== undefined, {
+  message: "Pelo menos um campo deve ser fornecido",
 });
 
 export const reservationFormSchema = z.object({

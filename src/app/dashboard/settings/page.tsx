@@ -10,12 +10,15 @@ import { Separator } from "@/components/ui/separator";
 import { getAnonymousMode, setAnonymousMode as saveAnonymousMode, APP_CONFIG } from "@/lib/constants/app-config";
 import { formatCurrencyInput, parseCurrency } from "@/lib/utils/format";
 import { toast } from "sonner";
-import { Save, Lock, Target, Calendar } from "lucide-react";
+import { Save, Lock, Target, Calendar, CreditCard } from "lucide-react";
 
 export default function SettingsPage() {
   const [anonymousMode, setAnonymousMode] = useState(false);
   const [fundraisingGoal, setFundraisingGoal] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const [pixKey, setPixKey] = useState("");
+  const [pixName, setPixName] = useState("");
+  const [pixCity, setPixCity] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,6 +27,9 @@ export default function SettingsPage() {
     const goalValue = (APP_CONFIG.fundraisingGoal * 100).toString();
     setFundraisingGoal(formatCurrencyInput(goalValue));
     setEventDate(APP_CONFIG.event.date.toISOString().split('T')[0]);
+    setPixKey(APP_CONFIG.pix.key);
+    setPixName(APP_CONFIG.pix.name);
+    setPixCity(APP_CONFIG.pix.city);
   }, []);
 
   const handleAnonymousModeChange = (checked: boolean) => {
@@ -44,10 +50,16 @@ export default function SettingsPage() {
 
     APP_CONFIG.fundraisingGoal = goalValue;
     APP_CONFIG.event.date = new Date(eventDate);
+    APP_CONFIG.pix.key = pixKey.trim();
+    APP_CONFIG.pix.name = pixName.trim();
+    APP_CONFIG.pix.city = pixCity.trim();
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('fundraisingGoal', goalValue.toString());
       localStorage.setItem('eventDate', eventDate);
+      localStorage.setItem('pixKey', pixKey.trim());
+      localStorage.setItem('pixName', pixName.trim());
+      localStorage.setItem('pixCity', pixCity.trim());
     }
 
     setHasChanges(false);
@@ -63,6 +75,9 @@ export default function SettingsPage() {
       localStorage.removeItem('fundraisingGoal');
       localStorage.removeItem('eventDate');
       localStorage.removeItem('anonymousMode');
+      localStorage.removeItem('pixKey');
+      localStorage.removeItem('pixName');
+      localStorage.removeItem('pixCity');
     }
 
     toast.success("Configurações restauradas para padrão");
@@ -182,6 +197,68 @@ export default function SettingsPage() {
               <Label>Nome do Evento</Label>
               <p className="text-sm text-muted-foreground">
                 {APP_CONFIG.event.name}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <CardTitle>Pagamento via Pix</CardTitle>
+            </div>
+            <CardDescription>
+              Configure sua chave Pix para receber pagamentos dos convidados
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="pix-key">Chave Pix</Label>
+              <Input
+                id="pix-key"
+                type="text"
+                value={pixKey}
+                onChange={(e) => {
+                  setPixKey(e.target.value);
+                  setHasChanges(true);
+                }}
+                placeholder="email@exemplo.com, CPF, telefone ou chave aleatória"
+              />
+              <p className="text-xs text-muted-foreground">
+                Pode ser CPF, CNPJ, e-mail, telefone ou chave aleatória
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pix-name">Nome do Beneficiário</Label>
+              <Input
+                id="pix-name"
+                type="text"
+                value={pixName}
+                onChange={(e) => {
+                  setPixName(e.target.value);
+                  setHasChanges(true);
+                }}
+                placeholder="Seu nome completo"
+              />
+              <p className="text-xs text-muted-foreground">
+                Nome que aparecerá no Pix
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pix-city">Cidade</Label>
+              <Input
+                id="pix-city"
+                type="text"
+                value={pixCity}
+                onChange={(e) => {
+                  setPixCity(e.target.value);
+                  setHasChanges(true);
+                }}
+                placeholder="Sua cidade"
+              />
+              <p className="text-xs text-muted-foreground">
+                Cidade do beneficiário
               </p>
             </div>
           </CardContent>

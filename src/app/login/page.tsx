@@ -1,25 +1,39 @@
-import { signIn } from "@/lib/auth";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FadeIn } from "@/components/ui/fade-in";
+import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
+  const handleLogin = async () => {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-100 dark:from-slate-950 dark:to-slate-900 p-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold">Chá de Casa Nova</CardTitle>
-          <CardDescription>
-            Faça login para gerenciar sua lista de presentes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            action={async () => {
-              "use server";
-              await signIn("google", { redirectTo: "/dashboard" });
-            }}
-          >
-            <Button type="submit" className="w-full" size="lg">
+      <FadeIn delay={0.2}>
+        <motion.div
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <Card className="w-full max-w-md shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <CardHeader className="space-y-1 text-center">
+              <FadeIn delay={0.3}>
+                <CardTitle className="text-3xl font-bold">Chá de Casa Nova</CardTitle>
+              </FadeIn>
+              <FadeIn delay={0.4}>
+                <CardDescription>
+                  Faça login para gerenciar sua lista de presentes
+                </CardDescription>
+              </FadeIn>
+            </CardHeader>
+            <CardContent>
+              <FadeIn delay={0.5}>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button onClick={handleLogin} className="w-full" size="lg">
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -39,13 +53,18 @@ export default function LoginPage() {
                 />
               </svg>
               Entrar com Google
-            </Button>
-          </form>
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Apenas administradores autorizados podem acessar</p>
-          </div>
-        </CardContent>
-      </Card>
+                  </Button>
+                </motion.div>
+              </FadeIn>
+              <FadeIn delay={0.6}>
+                <div className="mt-6 text-center text-sm text-muted-foreground">
+                  <p>Apenas administradores autorizados podem acessar</p>
+                </div>
+              </FadeIn>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </FadeIn>
     </div>
   );
 }

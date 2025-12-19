@@ -13,6 +13,9 @@ import Link from "next/link";
 import { APP_CONFIG } from "@/lib/constants/app-config";
 import { QRCodeModal } from "@/components/qr-code-modal";
 import { fireGoalConfetti } from "@/lib/utils/confetti";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { ProgressRing } from "@/components/ui/progress-ring";
+import { FadeIn } from "@/components/ui/fade-in";
 
 export default function DashboardPage() {
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -84,134 +87,154 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Produtos
-            </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold">{totalProducts}</div>
-            )}
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.1}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total de Produtos
+              </CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <AnimatedCounter value={totalProducts} className="text-2xl font-bold" />
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Produtos Reservados
-            </CardTitle>
-            <Gift className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div>
-                <div className="text-2xl font-bold">{reservedProducts}</div>
-                <p className="text-xs text-muted-foreground">
-                  {totalProducts > 0
-                    ? `${((reservedProducts / totalProducts) * 100).toFixed(0)}% da lista`
-                    : "0% da lista"}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32" />
-            ) : (
-              <div className="text-2xl font-bold">
-                {formatCurrency(totalValue)}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Valor Reservado
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32" />
-            ) : (
-              <div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(reservedValue)}
+        <FadeIn delay={0.2}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Produtos Reservados
+              </CardTitle>
+              <Gift className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <div>
+                  <AnimatedCounter value={reservedProducts} className="text-2xl font-bold" />
+                  <p className="text-xs text-muted-foreground">
+                    {totalProducts > 0
+                      ? `${((reservedProducts / totalProducts) * 100).toFixed(0)}% da lista`
+                      : "0% da lista"}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {totalValue > 0
-                    ? `${((reservedValue / totalValue) * 100).toFixed(0)}% do total`
-                    : "0% do total"}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
+
+        <FadeIn delay={0.3}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <div className="text-2xl font-bold">
+                  {formatCurrency(totalValue)}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
+
+        <FadeIn delay={0.4}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Valor Reservado
+              </CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <div>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(reservedValue)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {totalValue > 0
+                      ? `${((reservedValue / totalValue) * 100).toFixed(0)}% do total`
+                      : "0% do total"}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
       </div>
 
       {/* Fundraising Goal Progress */}
-      <Card className={isGoalReached ? "border-green-500 bg-green-50/50" : ""}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Meta de Arrecadação
-              </CardTitle>
-              <CardDescription>
-                Acompanhe o progresso da sua lista de presentes
-              </CardDescription>
-            </div>
-            {isGoalReached && (
-              <div className="text-4xl">🎉</div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-8 w-48" />
-            </>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progresso</span>
-                  <span className="font-medium">
-                    {Math.min(goalProgress, 100).toFixed(1)}%
-                  </span>
-                </div>
-                <Progress
-                  value={Math.min(goalProgress, 100)}
-                  className={`h-4 ${isGoalReached ? "bg-green-200" : ""}`}
-                />
+      <FadeIn delay={0.5}>
+        <Card className={`hover:shadow-lg transition-shadow duration-300 ${isGoalReached ? "border-green-500 bg-green-50/50" : ""}`}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Meta de Arrecadação
+                </CardTitle>
+                <CardDescription>
+                  Acompanhe o progresso da sua lista de presentes
+                </CardDescription>
               </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-primary">
-                    {formatCurrency(reservedValue)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    de {formatCurrency(APP_CONFIG.fundraisingGoal)}
-                  </p>
+              {isGoalReached && (
+                <div className="text-4xl">🎉</div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isLoading ? (
+              <>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-8 w-48" />
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-8">
+                  <div className="relative">
+                    <ProgressRing
+                      progress={Math.min(goalProgress, 100)}
+                      size={140}
+                      strokeWidth={10}
+                    />
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Progresso</span>
+                        <span className="font-medium">
+                          {Math.min(goalProgress, 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={Math.min(goalProgress, 100)}
+                        className={`h-4 ${isGoalReached ? "bg-green-200" : ""}`}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-primary">
+                        {formatCurrency(reservedValue)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        de {formatCurrency(APP_CONFIG.fundraisingGoal)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
+                <div>
                 {isGoalReached ? (
                   <div className="text-right">
                     <p className="text-lg font-semibold text-green-600">
@@ -234,9 +257,11 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+      </FadeIn>
 
       {/* Recent Reservations */}
-      <Card>
+      <FadeIn delay={0.6}>
+        <Card className="hover:shadow-lg transition-shadow duration-300">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Reservas Recentes</CardTitle>
           <Link href="/dashboard/reservations">
@@ -313,6 +338,7 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+      </FadeIn>
     </div>
     </>
   );

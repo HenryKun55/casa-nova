@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getCategoryInfo } from "@/lib/constants/categories";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { FadeIn } from "@/components/ui/fade-in";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { motion } from "framer-motion";
 
 export default function ListPage() {
   const { data: products, isLoading } = useProducts();
@@ -61,20 +64,28 @@ export default function ListPage() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 rounded-lg bg-card p-6 shadow-sm border">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-medium">Progresso da Lista</span>
-            <span className="text-sm text-muted-foreground">
-              {reservedProducts} de {totalProducts} presentes reservados
-            </span>
-          </div>
-          <div className="h-3 overflow-hidden rounded-full bg-rose-100 dark:bg-rose-950">
-            <div
-              className="h-full bg-rose-500 dark:bg-rose-600 transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
+        <FadeIn delay={0.2}>
+          <motion.div
+            className="mb-8 rounded-lg bg-card p-6 shadow-sm border"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-medium">Progresso da Lista</span>
+              <span className="text-sm text-muted-foreground">
+                <AnimatedCounter value={reservedProducts} /> de <AnimatedCounter value={totalProducts} /> presentes reservados
+              </span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-rose-100 dark:bg-rose-950">
+              <motion.div
+                className="h-full bg-rose-500 dark:bg-rose-600"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+              />
+            </div>
+          </motion.div>
+        </FadeIn>
 
         {/* Filtros */}
         <div className="mb-6 space-y-4">

@@ -98,6 +98,7 @@ export const reservations = pgTable("reservations", {
   whatsapp: text("whatsapp"),
   message: text("message"),
   confirmed: boolean("confirmed").notNull().default(false),
+  paid: boolean("paid").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 

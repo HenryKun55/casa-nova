@@ -24,6 +24,8 @@ import {
   ExternalLink,
   Download,
   FileSpreadsheet,
+  CreditCard,
+  DollarSign,
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -34,12 +36,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { exportReservationsToExcel, exportReservationsToCSV } from "@/lib/utils/export";
+import { ImageViewerModal } from "@/components/image-viewer-modal";
+import { FadeIn } from "@/components/ui/fade-in";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
+import { motion } from "framer-motion";
 
 export default function ReservationsPage() {
   const { data: reservations, isLoading } = useReservations();
   const updateReservation = useUpdateReservation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "confirmed" | "pending">("all");
+  const [selectedImage, setSelectedImage] = useState<{ url: string; alt: string } | null>(null);
 
   const handleToggleConfirm = async (reservationId: string, currentStatus: boolean) => {
     try {
@@ -54,6 +61,22 @@ export default function ReservationsPage() {
       );
     } catch (error) {
       toast.error("Erro ao atualizar reserva");
+    }
+  };
+
+  const handleTogglePaid = async (reservationId: string, currentStatus: boolean) => {
+    try {
+      await updateReservation.mutateAsync({
+        id: reservationId,
+        paid: !currentStatus,
+      });
+      toast.success(
+        !currentStatus
+          ? "Pagamento confirmado! 💰"
+          : "Pagamento marcado como pendente"
+      );
+    } catch (error) {
+      toast.error("Erro ao atualizar status de pagamento");
     }
   };
 
@@ -132,52 +155,58 @@ export default function ReservationsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Reservas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold">{reservations?.length || 0}</div>
-            )}
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.1}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total de Reservas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <AnimatedCounter value={reservations?.length || 0} className="text-2xl font-bold" />
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Presentes Recebidos
-            </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
+        <FadeIn delay={0.2}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Presentes Recebidos
+              </CardTitle>
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-20" />
             ) : (
-              <div className="text-2xl font-bold">{confirmedCount}</div>
+              <AnimatedCounter value={confirmedCount} className="text-2xl font-bold" />
             )}
           </CardContent>
         </Card>
+        </FadeIn>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Pendentes
-            </CardTitle>
-            <Clock className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold">{pendingCount}</div>
-            )}
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.3}>
+          <Card className="hover:shadow-lg transition-shadow duration-300">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Pendentes
+              </CardTitle>
+              <Clock className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <AnimatedCounter value={pendingCount} className="text-2xl font-bold" />
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
       </div>
 
       {/* Filters */}
@@ -231,19 +260,32 @@ export default function ReservationsPage() {
             ))}
           </>
         ) : filteredReservations && filteredReservations.length > 0 ? (
-          filteredReservations.map((reservation) => (
-            <Card key={reservation.id}>
-              <CardContent className="p-6">
+          filteredReservations.map((reservation, index) => (
+            <FadeIn key={reservation.id} delay={index * 0.05}>
+              <motion.div whileHover={{ scale: 1.01 }} transition={{ duration: 0.2 }}>
+                <Card className="hover:shadow-lg transition-shadow duration-300">
+                  <CardContent className="p-6">
                 <div className="flex flex-col gap-6 md:flex-row">
                   {/* Product Image */}
                   {reservation.product.imageUrl && (
-                    <div className="relative h-32 w-32 shrink-0 rounded-lg overflow-hidden bg-muted">
+                    <div
+                      className="relative min-h-[200px] w-64 shrink-0 rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity hover:shadow-lg"
+                      onClick={() => setSelectedImage({
+                        url: reservation.product.imageUrl!,
+                        alt: reservation.product.name
+                      })}
+                    >
                       <Image
                         src={reservation.product.imageUrl}
                         alt={reservation.product.name}
                         fill
-                        className="object-cover"
+                        className="object-contain p-2"
                       />
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors flex items-center justify-center">
+                        <div className="opacity-0 hover:opacity-100 transition-opacity text-white text-xs bg-black/50 px-2 py-1 rounded">
+                          Clique para ampliar
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -259,26 +301,48 @@ export default function ReservationsPage() {
                           {reservation.product.name} • {formatCurrency(reservation.product.price)}
                         </p>
                       </div>
-                      <Badge
-                        variant={reservation.confirmed ? "default" : "secondary"}
-                        className={
-                          reservation.confirmed
-                            ? "bg-green-500 hover:bg-green-600 text-white"
-                            : ""
-                        }
-                      >
-                        {reservation.confirmed ? (
-                          <>
-                            <CheckCircle2 className="mr-1 h-3 w-3" />
-                            Recebido
-                          </>
-                        ) : (
-                          <>
-                            <Clock className="mr-1 h-3 w-3" />
-                            Pendente
-                          </>
-                        )}
-                      </Badge>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge
+                          variant={reservation.confirmed ? "default" : "secondary"}
+                          className={
+                            reservation.confirmed
+                              ? "bg-green-500 hover:bg-green-600 text-white"
+                              : ""
+                          }
+                        >
+                          {reservation.confirmed ? (
+                            <>
+                              <CheckCircle2 className="mr-1 h-3 w-3" />
+                              Recebido
+                            </>
+                          ) : (
+                            <>
+                              <Clock className="mr-1 h-3 w-3" />
+                              Pendente
+                            </>
+                          )}
+                        </Badge>
+                        <Badge
+                          variant={reservation.paid ? "default" : "outline"}
+                          className={
+                            reservation.paid
+                              ? "bg-blue-500 hover:bg-blue-600 text-white"
+                              : "border-blue-300 text-blue-700"
+                          }
+                        >
+                          {reservation.paid ? (
+                            <>
+                              <DollarSign className="mr-1 h-3 w-3" />
+                              Pago
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="mr-1 h-3 w-3" />
+                              Não Pago
+                            </>
+                          )}
+                        </Badge>
+                      </div>
                     </div>
 
                     {/* Contact Info */}
@@ -336,7 +400,7 @@ export default function ReservationsPage() {
                           minute: "2-digit",
                         })}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         {reservation.product.purchaseLink && (
                           <Button variant="outline" size="sm" asChild>
                             <a
@@ -351,12 +415,29 @@ export default function ReservationsPage() {
                         )}
                         <Button
                           size="sm"
+                          variant={reservation.paid ? "outline" : "default"}
+                          onClick={() =>
+                            handleTogglePaid(reservation.id, reservation.paid)
+                          }
+                          disabled={updateReservation.isPending}
+                          className={
+                            !reservation.paid
+                              ? "bg-blue-500 hover:bg-blue-600"
+                              : ""
+                          }
+                        >
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          {reservation.paid ? "Marcar como Não Pago" : "Confirmar Pagamento"}
+                        </Button>
+                        <Button
+                          size="sm"
                           variant={reservation.confirmed ? "outline" : "default"}
                           onClick={() =>
                             handleToggleConfirm(reservation.id, reservation.confirmed)
                           }
                           disabled={updateReservation.isPending}
                         >
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
                           {reservation.confirmed ? "Marcar como Pendente" : "Marcar como Recebido"}
                         </Button>
                       </div>
@@ -365,6 +446,8 @@ export default function ReservationsPage() {
                 </div>
               </CardContent>
             </Card>
+              </motion.div>
+            </FadeIn>
           ))
         ) : (
           <Card>
@@ -378,6 +461,18 @@ export default function ReservationsPage() {
           </Card>
         )}
       </div>
+
+      {/* Image Viewer Modal */}
+      {selectedImage && (
+        <ImageViewerModal
+          imageUrl={selectedImage.url}
+          alt={selectedImage.alt}
+          open={!!selectedImage}
+          onOpenChange={(open) => {
+            if (!open) setSelectedImage(null);
+          }}
+        />
+      )}
     </div>
   );
 }

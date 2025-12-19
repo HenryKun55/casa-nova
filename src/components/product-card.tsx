@@ -10,6 +10,7 @@ import type { ProductWithReservation } from "@/hooks/use-products";
 import { ImageViewerModal } from "@/components/image-viewer-modal";
 import { getPriorityLevel } from "@/lib/utils/priority";
 import { getAnonymousMode } from "@/lib/constants/app-config";
+import { motion } from "framer-motion";
 
 interface ProductCardProps {
   product: ProductWithReservation;
@@ -43,7 +44,14 @@ export function ProductCard({ product, onReserve, isAdmin = false }: ProductCard
 
   return (
     <>
-      <Card className={`overflow-hidden ${isReserved ? "opacity-75" : ""}`}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        whileHover={{ scale: 1.02, y: -5 }}
+        className="h-full"
+      >
+      <Card className={`overflow-hidden h-full transition-shadow duration-300 hover:shadow-xl ${isReserved ? "opacity-75" : ""}`}>
         <CardHeader className="p-0">
           <div className="relative aspect-square w-full bg-muted group">
             {product.imageUrl ? (
@@ -133,6 +141,7 @@ export function ProductCard({ product, onReserve, isAdmin = false }: ProductCard
         )}
       </CardFooter>
     </Card>
+    </motion.div>
 
       {product.imageUrl && (
         <ImageViewerModal

@@ -38,6 +38,9 @@ import {
   reservationFormSchema,
   type ReservationFormValues
 } from "@/lib/validations/reservation";
+import { PixPaymentModal } from "@/components/pix-payment-modal";
+import { APP_CONFIG } from "@/lib/constants/app-config";
+import confetti from "canvas-confetti";
 
 interface ReservationModalProps {
   product: ProductWithReservation | null;
@@ -48,6 +51,9 @@ interface ReservationModalProps {
 export function ReservationModal({ product, open, onOpenChange }: ReservationModalProps) {
   const createReservation = useCreateReservation();
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPixModal, setShowPixModal] = useState(false);
+
+  const hasPixConfigured = !!(APP_CONFIG.pix.key && APP_CONFIG.pix.name && APP_CONFIG.pix.city);
 
   const form = useForm<ReservationFormValues>({
     resolver: zodResolver(reservationFormSchema),
@@ -81,10 +87,28 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
       setIsSuccess(true);
       toast.success("Presente reservado com sucesso! 🎉");
       form.reset();
-      setTimeout(() => {
-        onOpenChange(false);
-        setIsSuccess(false);
-      }, 2000);
+
+      // Confetti!
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#f43f5e', '#fb923c', '#fbbf24', '#a3e635', '#34d399']
+      });
+
+      // Se tem Pix configurado, abre o modal do Pix
+      if (hasPixConfigured) {
+        setTimeout(() => {
+          setIsSuccess(false);
+          setShowPixModal(true);
+        }, 2000);
+      } else {
+        // Senão, apenas fecha o modal
+        setTimeout(() => {
+          onOpenChange(false);
+          setIsSuccess(false);
+        }, 2000);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao reservar presente");
     }
@@ -97,18 +121,27 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
     currency: "BRL",
   }).format(Number(product.price));
 
+  const handlePixModalClose = () => {
+    setShowPixModal(false);
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        {isSuccess ? (
-          <div className="py-8 text-center">
-            <div className="mb-4 text-6xl">🎉</div>
-            <DialogTitle className="mb-2 text-2xl">Obrigado!</DialogTitle>
-            <DialogDescription>
-              Seu presente foi reservado com sucesso. O casal vai adorar!
-            </DialogDescription>
-          </div>
-        ) : (
+    <>
+      <Dialog open={open && !showPixModal} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          {isSuccess ? (
+            <div className="py-8 text-center">
+              <div className="mb-4 text-6xl">🎉</div>
+              <DialogTitle className="mb-2 text-2xl">Obrigado!</DialogTitle>
+              <DialogDescription>
+                {hasPixConfigured
+                  ? "Seu presente foi reservado! Agora você pode realizar o pagamento via Pix."
+                  : "Seu presente foi reservado com sucesso. O casal vai adorar!"
+                }
+              </DialogDescription>
+            </div>
+          ) : (
           <>
             <DialogHeader>
               <DialogTitle>Reservar Presente</DialogTitle>
@@ -251,5 +284,16 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
         )}
       </DialogContent>
     </Dialog>
+
+      {/* Modal do Pix */}
+      {hasPixConfigured && product && (
+        <PixPaymentModal
+          open={showPixModal}
+          onOpenChange={handlePixModalClose}
+          productName={product.name}
+          amount={Number(product.price)}
+        />
+      )}
+    </>
   );
 }

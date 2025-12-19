@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Gift, Heart, Home, Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { motion } from "framer-motion";
+import { FadeIn } from "@/components/ui/fade-in";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 
 export default function HomePage() {
   const [timeLeft, setTimeLeft] = useState({
@@ -43,99 +46,117 @@ export default function HomePage() {
       </div>
       <section className="container mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-16">
         <div className="text-center">
-          <div className="mb-8 inline-flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
-            <Home className="h-12 w-12" />
-          </div>
+          <FadeIn delay={0.1}>
+            <motion.div
+              className="mb-8 inline-flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+              whileHover={{ scale: 1.1, rotate: 360 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Home className="h-12 w-12" />
+            </motion.div>
+          </FadeIn>
 
-          <h1 className="mb-4 text-5xl font-bold text-primary md:text-7xl">
-            Chá de Casa Nova
-          </h1>
-          <p className="mb-8 text-xl text-muted-foreground md:text-2xl">
-            Estamos construindo nosso lar e você faz parte dessa história
-          </p>
+          <FadeIn delay={0.2}>
+            <h1 className="mb-4 text-5xl font-bold text-primary md:text-7xl">
+              Chá de Casa Nova
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.3}>
+            <p className="mb-8 text-xl text-muted-foreground md:text-2xl">
+              Estamos construindo nosso lar e você faz parte dessa história
+            </p>
+          </FadeIn>
 
           {/* Countdown */}
-          <div className="mb-12">
-            <p className="mb-4 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Contagem Regressiva para o Grande Dia
-            </p>
-            <div className="flex justify-center gap-4">
-              {Object.entries(timeLeft).map(([unit, value]) => (
-                <div
-                  key={unit}
-                  className="flex flex-col items-center rounded-lg bg-card border p-4 shadow-lg"
-                >
-                  <span className="text-3xl font-bold text-primary md:text-4xl">
-                    {String(value).padStart(2, "0")}
-                  </span>
-                  <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                    {unit === "days"
-                      ? "Dias"
-                      : unit === "hours"
-                      ? "Horas"
-                      : unit === "minutes"
-                      ? "Min"
-                      : "Seg"}
-                  </span>
-                </div>
-              ))}
+          <FadeIn delay={0.4}>
+            <div className="mb-12">
+              <p className="mb-4 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                Contagem Regressiva para o Grande Dia
+              </p>
+              <div className="flex justify-center gap-4">
+                {Object.entries(timeLeft).map(([unit, value], index) => (
+                  <motion.div
+                    key={unit}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    className="flex flex-col items-center rounded-lg bg-card border p-4 shadow-lg hover:shadow-xl transition-shadow"
+                  >
+                    <AnimatedCounter value={value} className="text-3xl font-bold text-primary md:text-4xl" />
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                      {unit === "days"
+                        ? "Dias"
+                        : unit === "hours"
+                        ? "Horas"
+                        : unit === "minutes"
+                        ? "Min"
+                        : "Seg"}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
+          </FadeIn>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Link href="/list">
-              <Button size="lg" className="w-full sm:w-auto">
-                <Gift className="mr-2 h-5 w-5" />
-                Ver Lista de Presentes
-              </Button>
-            </Link>
-            <Link href="/my-reservations">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                <Search className="mr-2 h-5 w-5" />
-                Consultar Minhas Reservas
-              </Button>
-            </Link>
-          </div>
+          <FadeIn delay={0.9}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link href="/list">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    <Gift className="mr-2 h-5 w-5" />
+                    Ver Lista de Presentes
+                  </Button>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link href="/my-reservations">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    <Search className="mr-2 h-5 w-5" />
+                    Consultar Minhas Reservas
+                  </Button>
+                </Link>
+              </motion.div>
+            </div>
+          </FadeIn>
 
           {/* Admin Link */}
-          <div className="mt-8">
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                Área Administrativa
-              </Button>
-            </Link>
-          </div>
+          <FadeIn delay={1}>
+            <div className="mt-8">
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:scale-105 transition-transform">
+                  Área Administrativa
+                </Button>
+              </Link>
+            </div>
+          </FadeIn>
         </div>
 
         <div className="mt-24 grid gap-8 md:grid-cols-3">
-          <div className="text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
-              <Gift className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Escolha seu Presente</h3>
-            <p className="text-sm text-muted-foreground">
-              Navegue pela nossa lista e escolha o presente perfeito
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
-              <Heart className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Reserve Online</h3>
-            <p className="text-sm text-muted-foreground">
-              Reserve seu presente de forma rápida e fácil
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
-              <Home className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Ajude a Construir</h3>
-            <p className="text-sm text-muted-foreground">
-              Faça parte da construção do nosso primeiro lar
-            </p>
-          </div>
+          {[
+            { icon: Gift, title: "Escolha seu Presente", desc: "Navegue pela nossa lista e escolha o presente perfeito", delay: 1.1 },
+            { icon: Heart, title: "Reserve Online", desc: "Reserve seu presente de forma rápida e fácil", delay: 1.2 },
+            { icon: Home, title: "Ajude a Construir", desc: "Faça parte da construção do nosso primeiro lar", delay: 1.3 }
+          ].map((item) => (
+            <FadeIn key={item.title} delay={item.delay}>
+              <motion.div
+                className="text-center"
+                whileHover={{ y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
+                  className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20"
+                  whileHover={{ rotate: 360, scale: 1.2 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <item.icon className="h-8 w-8 text-primary" />
+                </motion.div>
+                <h3 className="mb-2 text-lg font-semibold">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </motion.div>
+            </FadeIn>
+          ))}
         </div>
       </section>
 

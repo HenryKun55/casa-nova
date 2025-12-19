@@ -16,6 +16,7 @@ import {
 import { Loader2, Search, CheckCircle2, Clock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ImageViewerModal } from "@/components/image-viewer-modal";
 
 const COUNTRY_CODES = {
   BR: { code: "+55", placeholder: "(11) 99999-9999", flag: "🇧🇷", name: "Brasil" },
@@ -70,6 +71,7 @@ export default function MyReservationsPage() {
   const [countryCode, setCountryCode] = useState<keyof typeof COUNTRY_CODES>("BR");
   const [whatsapp, setWhatsapp] = useState("");
   const [searchWhatsapp, setSearchWhatsapp] = useState("");
+  const [selectedImage, setSelectedImage] = useState<{ url: string; alt: string } | null>(null);
 
   const { data: reservations, isLoading, error } = useQuery<MyReservation[]>({
     queryKey: ["my-reservations", searchWhatsapp],
@@ -230,11 +232,24 @@ export default function MyReservationsPage() {
                 <CardContent className="p-6">
                   <div className="flex flex-col gap-4 md:flex-row">
                     {reservation.product.imageUrl && (
-                      <img
-                        src={reservation.product.imageUrl}
-                        alt={reservation.product.name}
-                        className="h-32 w-32 rounded-lg object-cover"
-                      />
+                      <div
+                        className="relative min-h-[200px] w-64 shrink-0 rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-all hover:shadow-lg"
+                        onClick={() => setSelectedImage({
+                          url: reservation.product.imageUrl!,
+                          alt: reservation.product.name
+                        })}
+                      >
+                        <img
+                          src={reservation.product.imageUrl}
+                          alt={reservation.product.name}
+                          className="w-full h-full object-contain p-2"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <div className="text-white text-xs bg-black/50 px-2 py-1 rounded">
+                            Clique para ampliar
+                          </div>
+                        </div>
+                      </div>
                     )}
 
                     <div className="flex-1">
@@ -314,6 +329,18 @@ export default function MyReservationsPage() {
               </Card>
             ))}
           </div>
+        )}
+
+        {/* Image Viewer Modal */}
+        {selectedImage && (
+          <ImageViewerModal
+            imageUrl={selectedImage.url}
+            alt={selectedImage.alt}
+            open={!!selectedImage}
+            onOpenChange={(open) => {
+              if (!open) setSelectedImage(null);
+            }}
+          />
         )}
       </div>
     </div>
