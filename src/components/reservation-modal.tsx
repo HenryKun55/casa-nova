@@ -139,71 +139,24 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
               </DialogDescription>
             </div>
           ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle>Contribuir com Este Item</DialogTitle>
-              <DialogDescription>
-                {product.name} • {formattedPrice}
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="guestName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Seu Nome *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="João Silva" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="guestEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email (opcional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="joao@email.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid gap-2">
+            <>
+              <DialogHeader>
+                <DialogTitle>Contribuir com Este Item</DialogTitle>
+                <DialogDescription>
+                  {product.name} • {formattedPrice}
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="countryCode"
+                    name="guestName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>País</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o país" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.entries(COUNTRY_CODES).map(([code, country]) => (
-                              <SelectItem key={code} value={code}>
-                                {country.flag} {country.name} ({country.code})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormLabel>Seu Nome *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="João Silva" {...field} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -211,76 +164,123 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
 
                   <FormField
                     control={form.control}
-                    name="whatsapp"
+                    name="guestEmail"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>WhatsApp (opcional)</FormLabel>
+                        <FormLabel>Email (opcional)</FormLabel>
                         <FormControl>
                           <Input
+                            type="email"
+                            placeholder="joao@email.com"
                             {...field}
-                            type="tel"
-                            placeholder={COUNTRY_CODES[selectedCountry].placeholder}
-                            onChange={(e) => {
-                              const formatted = formatPhone(e.target.value, selectedCountry);
-                              field.onChange(formatted);
-                            }}
-                            maxLength={getPhoneMaxLength(selectedCountry)}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
 
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mensagem Carinhosa (opcional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Deixe uma mensagem especial para o casal..."
-                          className="resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <div className="grid gap-2">
+                    <FormField
+                      control={form.control}
+                      name="countryCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>País</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o país" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Object.entries(COUNTRY_CODES).map(([code, country]) => (
+                                <SelectItem key={code} value={code}>
+                                  {country.flag} {country.name} ({country.code})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => onOpenChange(false)}
-                    className="flex-1"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createReservation.isPending}
-                    className="flex-1"
-                  >
-                    {createReservation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Reservando...
-                      </>
-                    ) : (
-                      "Confirmar Reserva"
+                    <FormField
+                      control={form.control}
+                      name="whatsapp"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>WhatsApp (opcional)</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="tel"
+                              placeholder={COUNTRY_CODES[selectedCountry].placeholder}
+                              onChange={(e) => {
+                                const formatted = formatPhone(e.target.value, selectedCountry);
+                                field.onChange(formatted);
+                              }}
+                              maxLength={getPhoneMaxLength(selectedCountry)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mensagem Carinhosa (opcional)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Deixe uma mensagem especial para o casal..."
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+                  />
+
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => onOpenChange(false)}
+                      className="flex-1"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={createReservation.isPending}
+                      className="flex-1"
+                    >
+                      {createReservation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Reservando...
+                        </>
+                      ) : (
+                        "Confirmar Reserva"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Modal do Pix */}
       {hasPixConfigured && product && (

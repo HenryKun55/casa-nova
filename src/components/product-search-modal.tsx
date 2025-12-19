@@ -111,7 +111,7 @@ export function ProductSearchModal({
               placeholder="Ex: Geladeira Consul Frost Free, Sofá 3 lugares, Jogo de panelas..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               disabled={isSearching}
               className="flex-1"
             />
