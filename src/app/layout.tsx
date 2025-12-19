@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: "Chá de Casa Nova - Henrique & Yasmim",
   description: "Ajude-nos a mobiliar nossa casa nova! Escolha um presente da nossa lista especial.",
   manifest: "/manifest.json",
-  themeColor: "#e11d48",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -31,6 +30,10 @@ export const metadata: Metadata = {
   },
   keywords: ["chá de casa nova", "lista de presentes", "casa nova", "casamento"],
   authors: [{ name: "Henrique & Yasmim" }],
+};
+
+export const viewport: Viewport = {
+  themeColor: "#e11d48",
 };
 
 export default function RootLayout({
