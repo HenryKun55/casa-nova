@@ -56,6 +56,10 @@ const nextConfig: NextConfig = {
         hostname: "**.googleusercontent.com",
       },
       {
+        protocol: "https",
+        hostname: "**.gstatic.com",
+      },
+      {
         protocol: "http",
         hostname: "**",
       },

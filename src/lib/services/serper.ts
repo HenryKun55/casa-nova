@@ -25,11 +25,15 @@ export interface SerperSearchResponse {
 export async function searchProducts(query: string): Promise<SerperShoppingResult[]> {
   const apiKey = process.env.SERPER_API_KEY;
 
+  console.log("Serper API Key presente:", apiKey ? "Sim" : "Não");
+
   if (!apiKey) {
     throw new Error("SERPER_API_KEY não configurada");
   }
 
   try {
+    console.log("Fazendo requisição ao Serper com query:", query);
+
     const response = await fetch("https://google.serper.dev/shopping", {
       method: "POST",
       headers: {
@@ -44,15 +48,23 @@ export async function searchProducts(query: string): Promise<SerperShoppingResul
       }),
     });
 
+    console.log("Resposta do Serper - Status:", response.status);
+
     if (!response.ok) {
-      throw new Error(`Serper API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error("Resposta de erro do Serper:", errorText);
+      throw new Error(`Serper API error: ${response.status} - ${errorText}`);
     }
 
     const data: SerperSearchResponse = await response.json();
+    console.log("Dados recebidos do Serper:", data ? "Sim" : "Não");
 
     if (!data.shopping || data.shopping.length === 0) {
+      console.log("Nenhum resultado de shopping encontrado");
       return [];
     }
+
+    console.log("Total de resultados:", data.shopping.length);
 
     return data.shopping.map((result) => ({
       title: result.title,
@@ -65,7 +77,7 @@ export async function searchProducts(query: string): Promise<SerperShoppingResul
       delivery: result.delivery,
     }));
   } catch (error) {
-    console.error("Erro ao buscar produtos:", error);
+    console.error("Erro detalhado ao buscar produtos no Serper:", error);
     throw error;
   }
 }

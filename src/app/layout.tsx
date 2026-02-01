@@ -10,12 +10,6 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Nosso Lar - Henrique & Yasmim",
   description: "Estamos começando nossa jornada juntos na Quinta das Alamedas. Venha fazer parte do nosso sonho! ❤️",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Nosso Lar - H&Y",
-  },
   openGraph: {
     title: "Nosso Lar dos Sonhos - Henrique & Yasmim",
     description: "Estamos começando nossa jornada juntos na Quinta das Alamedas. Venha fazer parte do nosso sonho! ❤️",

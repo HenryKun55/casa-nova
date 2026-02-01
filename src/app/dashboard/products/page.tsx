@@ -123,7 +123,6 @@ export default function ProductsPage() {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setDeletingProduct(product)}
-                      disabled={!!product.reservation}
                       className="text-destructive focus:text-destructive"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -211,6 +210,11 @@ export default function ProductsPage() {
             <AlertDialogDescription>
               Esta ação não pode ser desfeita. O produto {deletingProduct?.name} será
               permanentemente removido da lista.
+              {deletingProduct?.reservation && (
+                <span className="block mt-2 font-medium text-amber-600 dark:text-amber-400">
+                  Este produto foi reservado por {deletingProduct.reservation.guestName}. A reserva também será removida.
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

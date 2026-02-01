@@ -1,8 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Product, Reservation } from "@/db/schema";
 import type { CreateProductInput, UpdateProductInput } from "@/lib/validations/product";
-import { db, type LocalProduct } from "@/lib/db/local-db";
-import { syncManager } from "@/lib/sync/sync-manager";
 
 export type ProductWithReservation = Product & {
   reservation: Reservation | null;
@@ -12,71 +10,9 @@ export function useProducts() {
   return useQuery<ProductWithReservation[]>({
     queryKey: ["products"],
     queryFn: async () => {
-      const localProducts = await db.products.toArray();
-
-      if (localProducts.length > 0) {
-        const productsWithReservations = await Promise.all(
-          localProducts.map(async (product) => {
-            const reservation = product.reservation || await db.reservations.get(product.id);
-            return {
-              ...product,
-              createdAt: new Date(product.createdAt),
-              updatedAt: new Date(product.updatedAt),
-              reservation: reservation ? {
-                ...reservation,
-                createdAt: new Date(reservation.createdAt),
-              } : null,
-            } as ProductWithReservation;
-          })
-        );
-
-        if (navigator.onLine) {
-          fetch("/api/products")
-            .then(async (res) => {
-              if (res.ok) {
-                const serverProducts = await res.json();
-
-                await db.products.clear();
-                await db.products.bulkAdd(
-                  serverProducts.map((p: ProductWithReservation) => ({
-                    ...p,
-                    createdAt: new Date(p.createdAt).toISOString(),
-                    updatedAt: new Date(p.updatedAt).toISOString(),
-                    reservation: p.reservation,
-                    _syncStatus: "synced" as const,
-                    _lastSync: new Date().toISOString(),
-                  }))
-                );
-              }
-            })
-            .catch((err) => {
-              console.error("Background sync failed:", err);
-            });
-        }
-
-        return productsWithReservations;
-      }
-
-      if (navigator.onLine) {
-        const res = await fetch("/api/products");
-        if (!res.ok) throw new Error("Erro ao carregar produtos");
-        const products = await res.json();
-
-        await db.products.bulkAdd(
-          products.map((p: ProductWithReservation) => ({
-            ...p,
-            createdAt: new Date(p.createdAt).toISOString(),
-            updatedAt: new Date(p.updatedAt).toISOString(),
-            reservation: p.reservation,
-            _syncStatus: "synced" as const,
-            _lastSync: new Date().toISOString(),
-          }))
-        );
-
-        return products;
-      }
-
-      throw new Error("Você está offline e não há dados salvos localmente");
+      const res = await fetch("/api/products");
+      if (!res.ok) throw new Error("Erro ao carregar produtos");
+      return res.json();
     },
   });
 }
@@ -107,18 +43,7 @@ export function useCreateProduct() {
         const error = await res.json();
         throw new Error(error.error || "Erro ao criar produto");
       }
-      const newProduct = await res.json();
-
-      await db.products.add({
-        ...newProduct,
-        createdAt: new Date(newProduct.createdAt).toISOString(),
-        updatedAt: new Date(newProduct.updatedAt).toISOString(),
-        reservation: newProduct.reservation,
-        _syncStatus: "synced" as const,
-        _lastSync: new Date().toISOString(),
-      });
-
-      return newProduct;
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -140,18 +65,7 @@ export function useUpdateProduct(id: string) {
         const error = await res.json();
         throw new Error(error.error || "Erro ao atualizar produto");
       }
-      const updatedProduct = await res.json();
-
-      await db.products.update(id, {
-        ...updatedProduct,
-        createdAt: new Date(updatedProduct.createdAt).toISOString(),
-        updatedAt: new Date(updatedProduct.updatedAt).toISOString(),
-        reservation: updatedProduct.reservation,
-        _syncStatus: "synced" as const,
-        _lastSync: new Date().toISOString(),
-      });
-
-      return updatedProduct;
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -172,9 +86,6 @@ export function useDeleteProduct() {
         const error = await res.json();
         throw new Error(error.error || "Erro ao deletar produto");
       }
-
-      await db.products.delete(id);
-
       return res.json();
     },
     onSuccess: () => {
