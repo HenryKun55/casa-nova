@@ -22,10 +22,13 @@ export default function HomePage() {
     fetch("/api/settings")
       .then((res) => res.json())
       .then((data) => {
-        setEventDate(new Date(data.eventDate));
+        // Extrai apenas YYYY-MM-DD e cria data no timezone local (evita problema de UTC)
+        const dateStr = data.eventDate.split("T")[0];
+        const [year, month, day] = dateStr.split("-").map(Number);
+        setEventDate(new Date(year, month - 1, day, 12, 0, 0));
       })
       .catch(() => {
-        setEventDate(new Date("2025-03-29"));
+        setEventDate(new Date(2026, 2, 29, 12, 0, 0));
       });
   }, []);
 
@@ -79,11 +82,42 @@ export default function HomePage() {
             </p>
           </FadeIn>
 
+          {/* Data do Evento */}
+          {eventDate && (
+            <FadeIn delay={0.4}>
+              <motion.div
+                className="mb-8 inline-flex items-center gap-4 rounded-2xl bg-card px-8 py-5 border shadow-lg"
+                whileHover={{ scale: 1.02, y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex flex-col items-center justify-center rounded-xl bg-primary/10 px-4 py-3 min-w-[70px]">
+                  <span className="text-xs font-bold uppercase text-primary">
+                    {eventDate.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}
+                  </span>
+                  <span className="text-3xl font-bold text-primary">
+                    {eventDate.getDate()}
+                  </span>
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1">
+                    Salve a Data
+                  </p>
+                  <p className="text-xl font-bold text-foreground md:text-2xl capitalize">
+                    {eventDate.toLocaleDateString("pt-BR", { weekday: "long" })}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {eventDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+                  </p>
+                </div>
+              </motion.div>
+            </FadeIn>
+          )}
+
           {/* Countdown */}
-          <FadeIn delay={0.4}>
+          <FadeIn delay={0.5}>
             <div className="mb-12">
               <p className="mb-4 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Contagem Regressiva para o Grande Dia
+                Contagem Regressiva
               </p>
               <div className="flex justify-center gap-4">
                 {Object.entries(timeLeft).map(([unit, value], index) => (
@@ -91,7 +125,7 @@ export default function HomePage() {
                     key={unit}
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.1, duration: 0.4 }}
+                    transition={{ delay: 0.6 + index * 0.1, duration: 0.4 }}
                     whileHover={{ scale: 1.1, y: -5 }}
                     className="flex flex-col items-center rounded-lg bg-card border p-4 shadow-lg hover:shadow-xl transition-shadow"
                   >

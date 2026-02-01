@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 
 const DEFAULT_SETTINGS = {
   id: "main" as const,
-  eventDate: new Date("2025-03-29"),
+  eventDate: new Date("2026-03-29"),
   fundraisingGoal: "15000",
   pixKey: null,
   pixName: null,
