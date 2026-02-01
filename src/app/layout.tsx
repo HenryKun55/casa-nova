@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FF6B4A", // Laranja vibrante da Quinta das Alamedas
+  themeColor: "#9C6644", // Toffee Brown
 };
 
 export default function RootLayout({

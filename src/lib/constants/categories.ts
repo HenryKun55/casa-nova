@@ -21,7 +21,7 @@ export const CATEGORY_MAP: Record<string, CategoryInfo> = {
     name: "Cozinha",
     icon: Utensils,
     emoji: "🍳",
-    color: "text-orange-600",
+    color: "text-amber-700",
   },
   "Quarto": {
     name: "Quarto",

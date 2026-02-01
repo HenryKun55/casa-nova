@@ -118,7 +118,7 @@ export default function MyReservationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50 to-white dark:from-slate-950 dark:to-slate-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white dark:from-stone-950 dark:to-stone-900 py-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="flex items-center justify-between mb-6">
           <Link href="/">
@@ -292,7 +292,7 @@ export default function MyReservationsPage() {
                         </p>
                       )}
 
-                      <p className="mb-2 text-lg font-semibold text-rose-600">
+                      <p className="mb-2 text-lg font-semibold text-primary">
                         {formatPrice(reservation.product.price)}
                       </p>
 

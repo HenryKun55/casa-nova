@@ -41,7 +41,7 @@ export default function ListPage() {
   const progress = totalProducts > 0 ? (reservedProducts / totalProducts) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-slate-950 dark:to-green-950">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 dark:from-stone-950 dark:to-stone-900">
       <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -76,7 +76,7 @@ export default function ListPage() {
                 <AnimatedCounter value={reservedProducts} /> de <AnimatedCounter value={totalProducts} /> itens já garantidos
               </span>
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-orange-100 dark:bg-orange-950">
+            <div className="h-3 overflow-hidden rounded-full bg-secondary dark:bg-secondary">
               <motion.div
                 className="h-full bg-primary dark:bg-primary"
                 initial={{ width: 0 }}

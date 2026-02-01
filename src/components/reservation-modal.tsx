@@ -92,7 +92,7 @@ export function ReservationModal({ product, open, onOpenChange }: ReservationMod
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#FF6B4A', '#F97316', '#FCD34D', '#2D5F4F', '#059669'] // Cores Quinta das Alamedas
+        colors: ['#9C6644', '#B08968', '#DDB892', '#E6CCB2', '#7F5539'] // Paleta Terrosa
       });
 
       if (hasPixConfigured) {

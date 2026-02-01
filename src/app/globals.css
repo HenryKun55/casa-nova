@@ -4,49 +4,50 @@
 
 @layer base {
   :root {
-    /* Cores da identidade visual Quinta das Alamedas */
-    --background: 30 35% 92%; /* Bege/areia claro */
-    --foreground: 160 35% 25%; /* Verde escuro */
-    --card: 0 0% 100%;
-    --card-foreground: 160 35% 25%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 35% 25%;
-    --primary: 12 100% 64%; /* Laranja/coral vibrante */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 30 30% 85%;
-    --secondary-foreground: 160 35% 25%;
-    --muted: 30 25% 88%;
-    --muted-foreground: 160 20% 45%;
-    --accent: 160 25% 45%; /* Verde médio */
-    --accent-foreground: 0 0% 100%;
+    /* Paleta Terrosa - Tons de Café e Caramelo */
+    --background: 30 40% 96%; /* Almond Cream claro #FBF9F6 */
+    --foreground: 24 38% 36%; /* Coffee Bean #7F5539 */
+    --card: 30 40% 98%;
+    --card-foreground: 24 38% 36%;
+    --popover: 30 40% 98%;
+    --popover-foreground: 24 38% 36%;
+    --primary: 23 39% 44%; /* Toffee Brown #9C6644 */
+    --primary-foreground: 30 40% 96%;
+    --secondary: 30 46% 80%; /* Pale Oak #E6CCB2 */
+    --secondary-foreground: 24 38% 30%;
+    --muted: 30 40% 88%; /* Almond Cream #EDE0D4 */
+    --muted-foreground: 24 30% 45%;
+    --accent: 28 35% 55%; /* Faded Copper #B08968 */
+    --accent-foreground: 30 40% 96%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 30 20% 82%;
-    --input: 30 20% 88%;
-    --ring: 12 100% 64%;
+    --border: 30 35% 82%;
+    --input: 30 40% 88%;
+    --ring: 23 39% 44%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 160 30% 8%; /* Verde escuro profundo */
-    --foreground: 30 30% 95%;
-    --card: 160 25% 12%;
-    --card-foreground: 30 30% 95%;
-    --popover: 160 30% 8%;
-    --popover-foreground: 30 30% 95%;
-    --primary: 12 95% 60%; /* Laranja um pouco mais suave no dark */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 160 20% 18%;
-    --secondary-foreground: 30 30% 95%;
-    --muted: 160 20% 15%;
-    --muted-foreground: 30 20% 65%;
-    --accent: 12 80% 55%; /* Laranja/coral para accent */
-    --accent-foreground: 0 0% 100%;
+    /* Paleta Terrosa Dark - Tons profundos de Café */
+    --background: 24 38% 10%; /* Coffee Bean escuro */
+    --foreground: 30 40% 92%; /* Almond Cream claro */
+    --card: 24 35% 14%;
+    --card-foreground: 30 40% 92%;
+    --popover: 24 38% 10%;
+    --popover-foreground: 30 40% 92%;
+    --primary: 30 54% 72%; /* Tan #DDB892 */
+    --primary-foreground: 24 38% 12%;
+    --secondary: 24 30% 20%;
+    --secondary-foreground: 30 40% 90%;
+    --muted: 24 25% 18%;
+    --muted-foreground: 30 35% 65%;
+    --accent: 28 35% 55%; /* Faded Copper #B08968 */
+    --accent-foreground: 30 40% 96%;
     --destructive: 0 60% 45%;
     --destructive-foreground: 0 85% 97%;
-    --border: 160 20% 22%;
-    --input: 160 20% 18%;
-    --ring: 12 95% 60%;
+    --border: 24 25% 22%;
+    --input: 24 25% 18%;
+    --ring: 30 54% 72%;
   }
 }
 
