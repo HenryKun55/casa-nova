@@ -1,91 +1,119 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getAnonymousMode, setAnonymousMode as saveAnonymousMode, APP_CONFIG } from "@/lib/constants/app-config";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrencyInput, parseCurrency } from "@/lib/utils/format";
 import { toast } from "sonner";
-import { Save, Lock, Target, Calendar, CreditCard } from "lucide-react";
+import { Save, Lock, Target, Calendar, CreditCard, Loader2 } from "lucide-react";
+
+interface Settings {
+  id: string;
+  eventDate: string;
+  fundraisingGoal: string;
+  pixKey: string | null;
+  pixName: string | null;
+  pixCity: string | null;
+  anonymousMode: boolean;
+}
 
 export default function SettingsPage() {
-  const [anonymousMode, setAnonymousMode] = useState(false);
+  const queryClient = useQueryClient();
   const [fundraisingGoal, setFundraisingGoal] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [pixKey, setPixKey] = useState("");
   const [pixName, setPixName] = useState("");
   const [pixCity, setPixCity] = useState("");
+  const [anonymousMode, setAnonymousMode] = useState(true);
   const [hasChanges, setHasChanges] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { data: settings, isLoading } = useQuery<Settings>({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const res = await fetch("/api/settings");
+      if (!res.ok) throw new Error("Erro ao carregar configurações");
+      return res.json();
+    },
+  });
+
+  const updateSettings = useMutation({
+    mutationFn: async (data: Partial<Settings>) => {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Erro ao salvar configurações");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["settings"] });
+      toast.success("Configurações salvas com sucesso!");
+      setHasChanges(false);
+    },
+    onError: () => {
+      toast.error("Erro ao salvar configurações");
+    },
+  });
 
   useEffect(() => {
-    setAnonymousMode(getAnonymousMode());
-    const goalValue = (APP_CONFIG.fundraisingGoal * 100).toString();
-    setFundraisingGoal(formatCurrencyInput(goalValue));
-    setEventDate(APP_CONFIG.event.date.toISOString().split('T')[0]);
-    setPixKey(APP_CONFIG.pix.key);
-    setPixName(APP_CONFIG.pix.name);
-    setPixCity(APP_CONFIG.pix.city);
-  }, []);
-
-  const handleAnonymousModeChange = (checked: boolean) => {
-    setAnonymousMode(checked);
-    saveAnonymousMode(checked);
-    toast.success(checked ? "Modo anônimo ativado" : "Modo anônimo desativado");
-  };
+    if (settings) {
+      const goalValue = (parseFloat(settings.fundraisingGoal) * 100).toString();
+      setFundraisingGoal(formatCurrencyInput(goalValue));
+      setEventDate(new Date(settings.eventDate).toISOString().split("T")[0]);
+      setPixKey(settings.pixKey || "");
+      setPixName(settings.pixName || "");
+      setPixCity(settings.pixCity || "");
+      setAnonymousMode(settings.anonymousMode);
+    }
+  }, [settings]);
 
   const handleSave = () => {
-    setIsLoading(true);
-
     const goalValue = parseCurrency(fundraisingGoal);
     if (isNaN(goalValue) || goalValue <= 0) {
       toast.error("Meta deve ser um valor positivo");
-      setIsLoading(false);
       return;
     }
 
-    APP_CONFIG.fundraisingGoal = goalValue;
-    APP_CONFIG.event.date = new Date(eventDate);
-    APP_CONFIG.pix.key = pixKey.trim();
-    APP_CONFIG.pix.name = pixName.trim();
-    APP_CONFIG.pix.city = pixCity.trim();
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('fundraisingGoal', goalValue.toString());
-      localStorage.setItem('eventDate', eventDate);
-      localStorage.setItem('pixKey', pixKey.trim());
-      localStorage.setItem('pixName', pixName.trim());
-      localStorage.setItem('pixCity', pixCity.trim());
-    }
-
-    setHasChanges(false);
-    toast.success("Configurações salvas com sucesso!");
-
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1000);
+    updateSettings.mutate({
+      eventDate,
+      fundraisingGoal: goalValue.toString(),
+      pixKey: pixKey.trim() || null,
+      pixName: pixName.trim() || null,
+      pixCity: pixCity.trim() || null,
+      anonymousMode,
+    });
   };
 
-  const handleReset = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('fundraisingGoal');
-      localStorage.removeItem('eventDate');
-      localStorage.removeItem('anonymousMode');
-      localStorage.removeItem('pixKey');
-      localStorage.removeItem('pixName');
-      localStorage.removeItem('pixCity');
-    }
-
-    toast.success("Configurações restauradas para padrão");
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-9 w-48" />
+          <Skeleton className="h-5 w-72 mt-2" />
+        </div>
+        <div className="grid gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-64" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -115,14 +143,42 @@ export default function SettingsPage() {
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   Quando ativado, os nomes dos convidados que reservaram presentes
-                  ficarão ocultos na lista pública. Apenas administradores poderão
-                  ver quem reservou cada item.
+                  ficarão ocultos na lista pública.
                 </p>
               </div>
               <Switch
                 id="anonymous-mode"
                 checked={anonymousMode}
-                onCheckedChange={handleAnonymousModeChange}
+                onCheckedChange={(checked) => {
+                  setAnonymousMode(checked);
+                  setHasChanges(true);
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <CardTitle>Data do Evento</CardTitle>
+            </div>
+            <CardDescription>
+              Data do chá de casa nova (aparece no countdown da página inicial)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="event-date">Data do Evento</Label>
+              <Input
+                id="event-date"
+                type="date"
+                value={eventDate}
+                onChange={(e) => {
+                  setEventDate(e.target.value);
+                  setHasChanges(true);
+                }}
               />
             </div>
           </CardContent>
@@ -153,51 +209,6 @@ export default function SettingsPage() {
                 placeholder="R$ 15.000,00"
                 className="text-lg font-medium"
               />
-              <p className="text-sm text-muted-foreground">
-                Meta salva: {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(APP_CONFIG.fundraisingGoal)}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              <CardTitle>Informações do Evento</CardTitle>
-            </div>
-            <CardDescription>
-              Detalhes sobre o chá de casa nova
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="event-date">Data do Evento</Label>
-              <Input
-                id="event-date"
-                type="date"
-                value={eventDate}
-                onChange={(e) => {
-                  setEventDate(e.target.value);
-                  setHasChanges(true);
-                }}
-              />
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              <Label>Casal</Label>
-              <p className="text-sm text-muted-foreground">
-                {APP_CONFIG.event.couple}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label>Nome do Evento</Label>
-              <p className="text-sm text-muted-foreground">
-                {APP_CONFIG.event.name}
-              </p>
             </div>
           </CardContent>
         </Card>
@@ -225,9 +236,6 @@ export default function SettingsPage() {
                 }}
                 placeholder="email@exemplo.com, CPF, telefone ou chave aleatória"
               />
-              <p className="text-xs text-muted-foreground">
-                Pode ser CPF, CNPJ, e-mail, telefone ou chave aleatória
-              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="pix-name">Nome do Beneficiário</Label>
@@ -241,9 +249,6 @@ export default function SettingsPage() {
                 }}
                 placeholder="Seu nome completo"
               />
-              <p className="text-xs text-muted-foreground">
-                Nome que aparecerá no Pix
-              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="pix-city">Cidade</Label>
@@ -257,34 +262,23 @@ export default function SettingsPage() {
                 }}
                 placeholder="Sua cidade"
               />
-              <p className="text-xs text-muted-foreground">
-                Cidade do beneficiário
-              </p>
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="flex items-center justify-between gap-4 p-4 rounded-lg border bg-muted/50">
-        <div className="space-y-1">
-          <p className="font-medium">Restaurar Configurações Padrão</p>
-          <p className="text-sm text-muted-foreground">
-            Voltar todas as configurações para os valores iniciais
-          </p>
-        </div>
-        <Button variant="outline" onClick={handleReset}>
-          Restaurar
-        </Button>
       </div>
 
       <div className="flex justify-end gap-3">
         <Button
           size="lg"
           onClick={handleSave}
-          disabled={!hasChanges || isLoading}
+          disabled={!hasChanges || updateSettings.isPending}
         >
-          <Save className="mr-2 h-4 w-4" />
-          {isLoading ? "Salvando..." : "Salvar Alterações"}
+          {updateSettings.isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          {updateSettings.isPending ? "Salvando..." : "Salvar Alterações"}
         </Button>
       </div>
     </div>

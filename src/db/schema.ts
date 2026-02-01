@@ -113,6 +113,17 @@ export const activityLog = pgTable("activity_log", {
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const settings = pgTable("settings", {
+  id: text("id").primaryKey().default("main"),
+  eventDate: timestamp("event_date", { mode: "date" }).notNull(),
+  fundraisingGoal: decimal("fundraising_goal", { precision: 10, scale: 2 }).notNull().default("15000"),
+  pixKey: text("pix_key"),
+  pixName: text("pix_name"),
+  pixCity: text("pix_city"),
+  anonymousMode: boolean("anonymous_mode").notNull().default(true),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -124,3 +135,6 @@ export type NewReservation = typeof reservations.$inferInsert;
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type NewActivityLog = typeof activityLog.$inferInsert;
+
+export type Settings = typeof settings.$inferSelect;
+export type NewSettings = typeof settings.$inferInsert;

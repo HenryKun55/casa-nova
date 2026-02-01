@@ -16,9 +16,21 @@ export default function HomePage() {
     minutes: 0,
     seconds: 0,
   });
+  const [eventDate, setEventDate] = useState<Date | null>(null);
 
   useEffect(() => {
-    const eventDate = new Date(process.env.NEXT_PUBLIC_EVENT_DATE || "2025-06-15");
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        setEventDate(new Date(data.eventDate));
+      })
+      .catch(() => {
+        setEventDate(new Date("2025-03-29"));
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!eventDate) return;
 
     const calculateTimeLeft = () => {
       const difference = eventDate.getTime() - new Date().getTime();
@@ -37,7 +49,7 @@ export default function HomePage() {
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [eventDate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-stone-950 dark:via-stone-900 dark:to-stone-950">
