@@ -167,43 +167,8 @@ export default function HomePage() {
             </div>
           </FadeIn>
 
-          {/* Admin Link */}
-          <FadeIn delay={1}>
-            <div className="mt-8">
-              <Link href="/login">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:scale-105 transition-transform">
-                  Área Administrativa
-                </Button>
-              </Link>
-            </div>
-          </FadeIn>
         </div>
 
-        <div className="mt-24 grid gap-8 md:grid-cols-3">
-          {[
-            { icon: Gift, title: "Escolha com Carinho", desc: "Veja o que precisamos para começar nossa vida juntos", delay: 1.1 },
-            { icon: Heart, title: "Contribua com Amor", desc: "Sua ajuda faz toda diferença no nosso começo", delay: 1.2 },
-            { icon: Home, title: "Construa Conosco", desc: "Cada presente é um tijolo no nosso lar", delay: 1.3 }
-          ].map((item) => (
-            <FadeIn key={item.title} delay={item.delay}>
-              <motion.div
-                className="text-center"
-                whileHover={{ y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.div
-                  className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20"
-                  whileHover={{ rotate: 360, scale: 1.2 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <item.icon className="h-8 w-8 text-primary" />
-                </motion.div>
-                <h3 className="mb-2 text-lg font-semibold">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
-              </motion.div>
-            </FadeIn>
-          ))}
-        </div>
       </section>
 
       <footer className="border-t bg-background/50 backdrop-blur-sm py-8 text-center">
