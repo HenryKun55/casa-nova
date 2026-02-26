@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -239,10 +240,11 @@ export default function MyReservationsPage() {
                           alt: reservation.product.name
                         })}
                       >
-                        <img
+                        <Image
                           src={reservation.product.imageUrl}
                           alt={reservation.product.name}
-                          className="w-full h-full object-contain p-2"
+                          fill
+                          className="object-contain p-2"
                         />
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                           <div className="text-white text-xs bg-black/50 px-2 py-1 rounded">

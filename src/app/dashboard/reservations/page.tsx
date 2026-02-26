@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useReservations, useUpdateReservation } from "@/hooks/use-reservations";
+import { useReservations, useUpdateReservation, useDeleteReservation } from "@/hooks/use-reservations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
   FileSpreadsheet,
   CreditCard,
   DollarSign,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -37,6 +38,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { exportReservationsToExcel, exportReservationsToCSV } from "@/lib/utils/export";
 import { ImageViewerModal } from "@/components/image-viewer-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { FadeIn } from "@/components/ui/fade-in";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { motion } from "framer-motion";
@@ -44,6 +56,7 @@ import { motion } from "framer-motion";
 export default function ReservationsPage() {
   const { data: reservations, isLoading } = useReservations();
   const updateReservation = useUpdateReservation();
+  const deleteReservation = useDeleteReservation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "confirmed" | "pending">("all");
   const [selectedImage, setSelectedImage] = useState<{ url: string; alt: string } | null>(null);
@@ -61,6 +74,15 @@ export default function ReservationsPage() {
       );
     } catch (error) {
       toast.error("Erro ao atualizar reserva");
+    }
+  };
+
+  const handleDelete = async (reservationId: string, guestName: string) => {
+    try {
+      await deleteReservation.mutateAsync(reservationId);
+      toast.success(`Reserva de ${guestName} removida com sucesso`);
+    } catch (error) {
+      toast.error("Erro ao remover reserva");
     }
   };
 
@@ -381,7 +403,7 @@ export default function ReservationsPage() {
                           <div className="flex-1">
                             <p className="text-sm font-medium">Mensagem:</p>
                             <p className="text-sm text-muted-foreground italic">
-                              "{reservation.message}"
+                              &ldquo;{reservation.message}&rdquo;
                             </p>
                           </div>
                         </div>
@@ -440,6 +462,38 @@ export default function ReservationsPage() {
                           <CheckCircle2 className="mr-2 h-4 w-4" />
                           {reservation.confirmed ? "Marcar como Pendente" : "Marcar como Recebido"}
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
+                              disabled={deleteReservation.isPending}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Remover
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Remover reserva</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja remover a reserva de{" "}
+                                <strong>{reservation.guestName}</strong> para o produto{" "}
+                                <strong>{reservation.product.name}</strong>? O produto voltará a ficar disponível para outros convidados.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(reservation.id, reservation.guestName)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Remover reserva
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </div>

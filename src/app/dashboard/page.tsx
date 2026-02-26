@@ -320,7 +320,7 @@ export default function DashboardPage() {
                       )}
                       {reservation.message && (
                         <p className="text-xs text-muted-foreground italic mt-1">
-                          "{reservation.message}"
+                          &ldquo;{reservation.message}&rdquo;
                         </p>
                       )}
                     </div>

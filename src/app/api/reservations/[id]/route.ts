@@ -45,3 +45,41 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.isAdmin) {
+      return NextResponse.json(
+        { error: "Não autorizado" },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await context.params;
+
+    const [deletedReservation] = await db
+      .delete(reservations)
+      .where(eq(reservations.id, id))
+      .returning();
+
+    if (!deletedReservation) {
+      return NextResponse.json(
+        { error: "Reserva não encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting reservation:", error);
+    return NextResponse.json(
+      { error: "Erro ao remover reserva" },
+      { status: 500 }
+    );
+  }
+}
