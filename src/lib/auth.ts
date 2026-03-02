@@ -1,46 +1,70 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
+// import Google from "next-auth/providers/google";
+// import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import Credentials from "next-auth/providers/credentials";
 import { db } from "@/db";
-import { users, accounts, sessions, verificationTokens } from "@/db/schema";
+import { adminCredentials } from "@/db/schema";
 import { eq } from "drizzle-orm";
-
-const adminEmails = process.env.ADMIN_EMAILS?.split(",") ?? [];
+import bcrypt from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  // adapter: DrizzleAdapter(db, {
+  //   usersTable: users,
+  //   accountsTable: accounts,
+  //   sessionsTable: sessions,
+  //   verificationTokensTable: verificationTokens,
+  // }),
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    // Google({
+    //   clientId: process.env.GOOGLE_CLIENT_ID!,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    // }),
+    Credentials({
+      name: "credentials",
+      credentials: {
+        username: { label: "Usuário", type: "text" },
+        password: { label: "Senha", type: "password" },
+      },
+      async authorize(credentials) {
+        const username = credentials?.username as string;
+        const password = credentials?.password as string;
+
+        if (!username || !password) return null;
+
+        const admin = await db.query.adminCredentials.findFirst({
+          where: eq(adminCredentials.username, username),
+        });
+
+        if (!admin) return null;
+
+        const isValid = await bcrypt.compare(password, admin.passwordHash);
+        if (!isValid) return null;
+
+        return {
+          id: admin.id,
+          name: admin.username,
+          isAdmin: true,
+        };
+      },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    async signIn({ user }) {
-      if (user.email && adminEmails.includes(user.email)) {
-        await db
-          .update(users)
-          .set({ isAdmin: true })
-          .where(eq(users.email, user.email));
+    async jwt({ token, user }) {
+      if (user) {
+        token.isAdmin = (user as any).isAdmin ?? false;
       }
-      return true;
+      return token;
     },
-    async session({ session, user }) {
-      const dbUser = await db.query.users.findFirst({
-        where: eq(users.id, user.id),
-      });
-
+    async session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
-          id: user.id,
-          isAdmin: dbUser?.isAdmin ?? false,
+          id: token.sub!,
+          isAdmin: (token.isAdmin as boolean) ?? false,
         },
       };
     },

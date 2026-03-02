@@ -102,6 +102,15 @@ export const reservations = pgTable("reservations", {
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const adminCredentials = pgTable("admin_credentials", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+});
+
 export const activityLog = pgTable("activity_log", {
   id: text("id")
     .primaryKey()
@@ -138,3 +147,6 @@ export type NewActivityLog = typeof activityLog.$inferInsert;
 
 export type Settings = typeof settings.$inferSelect;
 export type NewSettings = typeof settings.$inferInsert;
+
+export type AdminCredential = typeof adminCredentials.$inferSelect;
+export type NewAdminCredential = typeof adminCredentials.$inferInsert;
