@@ -31,6 +31,9 @@ yarn-error.log*
 .env
 .env*.local
 
+# backup do banco (dados pessoais — manter só local)
+/backup
+
 # vercel
 .vercel
 

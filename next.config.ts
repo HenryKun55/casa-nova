@@ -1,75 +1,16 @@
 import type { NextConfig } from "next";
 
+// Site estático para GitHub Pages: https://henrykun55.github.io/casa-nova/
+// Em produção (GitHub Actions) usamos basePath; em dev fica na raiz.
+const isProd = process.env.NODE_ENV === "production";
+const basePath = isProd ? "/casa-nova" : "";
+
 const nextConfig: NextConfig = {
+  output: "export", // gera HTML estático em ./out
+  basePath,
+  trailingSlash: true, // melhor compatibilidade com GitHub Pages
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "storage.googleapis.com",
-      },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "i.ibb.co",
-      },
-      {
-        protocol: "https",
-        hostname: "i.imgur.com",
-      },
-      {
-        protocol: "https",
-        hostname: "**.magazineluiza.com.br",
-      },
-      {
-        protocol: "https",
-        hostname: "**.americanas.com.br",
-      },
-      {
-        protocol: "https",
-        hostname: "**.mercadolivre.com.br",
-      },
-      {
-        protocol: "https",
-        hostname: "**.shopee.com.br",
-      },
-      {
-        protocol: "https",
-        hostname: "m.media-amazon.com",
-      },
-      {
-        protocol: "https",
-        hostname: "images.tcdn.com.br",
-      },
-      {
-        protocol: "https",
-        hostname: "**.fbcdn.net",
-      },
-      {
-        protocol: "https",
-        hostname: "**.googleusercontent.com",
-      },
-      {
-        protocol: "https",
-        hostname: "**.gstatic.com",
-      },
-      {
-        protocol: "http",
-        hostname: "**",
-      },
-      {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
-    unoptimized: false,
-    minimumCacheTTL: 60 * 60 * 24 * 7,
+    unoptimized: true, // GitHub Pages não tem otimizador de imagem
   },
 };
 
