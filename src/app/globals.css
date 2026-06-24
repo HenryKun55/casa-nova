@@ -59,3 +59,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Campo de mensagens flutuantes */
+.float-card {
+  transform-origin: center center;
+}
+.float-msg {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.float-card.is-focused {
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.35);
+  border-color: hsl(var(--primary));
+}
+.float-card.is-focused .float-msg {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  /* limita à altura visível e rola o texto dentro do card */
+  max-height: 55dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
